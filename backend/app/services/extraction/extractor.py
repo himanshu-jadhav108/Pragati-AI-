@@ -176,7 +176,8 @@ class RuleBasedFallbackExtractor(LLMExtractor):
 
 class HostedLLMExtractor(LLMExtractor):
     """
-    Hosted LLM Extractor (OpenAI / Gemini) with fallback to deterministic extractor.
+    Hosted LLM Extractor (Gemini / OpenAI) with automatic fallback to deterministic extractor.
+    Uses Gemini 2.5 Flash / Flash Latest for high-speed, grounded event extraction.
     """
     def __init__(self):
         self.fallback = RuleBasedFallbackExtractor()
@@ -187,34 +188,92 @@ class HostedLLMExtractor(LLMExtractor):
         if not api_key:
             return self.fallback.extract_events(text, metadata)
 
-        # In case external API call is attempted and fails or network unavailable, degrade to fallback
         try:
             import httpx
-            # If Gemini API configured:
+            # Gemini Extraction Pipeline
             if settings.GEMINI_API_KEY:
-                # Structured prompt
                 prompt = (
-                    "You are PRAGATI AI extraction assistant. Extract construction progress events into JSON array.\n"
-                    "Only extract facts explicitly present in the text. Do not invent activity IDs.\n"
-                    f"Text: {text}\n"
-                    "Output JSON schema: [{'event_date': str, 'discipline': str, 'activity_description': str, "
-                    "'location': str, 'equipment_id': str, 'status': str, 'quantity': float, 'unit': str, 'evidence_text': str}]"
+                    "You are PRAGATI AI extraction assistant for construction and pipeline engineering.\n"
+                    "Extract progress events from the text into a JSON array.\n"
+                    "Only extract facts explicitly stated in the text. Do not invent or guess WBS codes.\n"
+                    f"Report Text:\n{text}\n\n"
+                    "Return ONLY a valid JSON array of objects formatted exactly like this:\n"
+                    "[\n"
+                    "  {\n"
+                    '    "event_date": "YYYY-MM-DD" or null,\n'
+                    '    "discipline": "Piping" or "Civil" or "Mechanical" or "Electrical" or "Instrumentation" or "HSE" or null,\n'
+                    '    "activity_description": "concise description of work performed",\n'
+                    '    "location": "location tag (e.g. V-105, Pump House PH-1)" or null,\n'
+                    '    "equipment_id": "equipment tag (e.g. V-105, P-101A)" or null,\n'
+                    '    "status": "COMPLETED" or "IN_PROGRESS" or "NOT_STARTED",\n'
+                    '    "progress_percent": float percentage 0-100 or null,\n'
+                    '    "quantity": number or null,\n'
+                    '    "unit": "unit string (e.g. spools, joints, m, cum)" or null,\n'
+                    '    "evidence_text": "exact sentence snippet from report text justifying this event"\n'
+                    "  }\n"
+                    "]\n"
+                    "Do NOT include markdown formatting, conversational text, or explanations. Only the raw JSON array."
                 )
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={settings.GEMINI_API_KEY}"
-                resp = httpx.post(url, json={"contents": [{"parts": [{"text": prompt}]}]}, timeout=8.0)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    raw_out = data["candidates"][0]["content"]["parts"][0]["text"]
-                    # Clean markdown codeblocks
-                    clean_json = re.sub(r"```json|```", "", raw_out).strip()
-                    items = json.loads(clean_json)
-                    return [FieldEventExtract(**item) for item in items]
-        except Exception:
-            pass
+                
+                models_to_try = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-1.5-flash"]
+                for model in models_to_try:
+                    try:
+                        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={settings.GEMINI_API_KEY}"
+                        resp = httpx.post(url, json={"contents": [{"parts": [{"text": prompt}]}]}, timeout=20.0)
+                        if resp.status_code == 200:
+                            data = resp.json()
+                            raw_out = data["candidates"][0]["content"]["parts"][0]["text"]
+                            clean_json = re.sub(r"```json|```", "", raw_out).strip()
+                            json_match = re.search(r"\[.*\]", clean_json, re.DOTALL)
+                            if json_match:
+                                items = json.loads(json_match.group(0))
+                                if isinstance(items, list) and len(items) > 0:
+                                    extracted = []
+                                    for item in items:
+                                        status_val = str(item.get("status", "IN_PROGRESS")).upper()
+                                        if status_val not in ["COMPLETED", "IN_PROGRESS", "NOT_STARTED"]:
+                                            status_val = "IN_PROGRESS"
+                                        prog_pct = item.get("progress_percent")
+                                        if prog_pct is None and status_val == "COMPLETED":
+                                            prog_pct = 100.0
+                                        elif prog_pct is not None:
+                                            try:
+                                                prog_pct = float(prog_pct)
+                                            except (ValueError, TypeError):
+                                                prog_pct = 0.0
+                                        qty = item.get("quantity")
+                                        if qty is not None:
+                                            try:
+                                                qty = float(qty)
+                                            except (ValueError, TypeError):
+                                                qty = None
+
+                                        extracted.append(FieldEventExtract(
+                                            event_date=item.get("event_date") or (metadata.get("date") if metadata else None),
+                                            discipline=item.get("discipline"),
+                                            activity_description=item.get("activity_description") or text[:100],
+                                            location=item.get("location"),
+                                            equipment_id=item.get("equipment_id"),
+                                            status=status_val,
+                                            progress_percent=prog_pct,
+                                            quantity=qty,
+                                            unit=item.get("unit"),
+                                            source_reference=metadata.get("filename", "Field DPR") if metadata else "Field DPR",
+                                            evidence_text=item.get("evidence_text") or text[:150]
+                                        ))
+                                    if extracted:
+                                        print(f"INFO: PRAGATI AI successfully extracted {len(extracted)} events using live Gemini ({model})")
+                                        return extracted
+                    except Exception as me:
+                        print(f"INFO: Gemini model {model} attempt: {me}")
+                        continue
+        except Exception as e:
+            print(f"WARNING: Hosted LLM extraction error: {e}. Falling back to deterministic NLP.")
 
         return self.fallback.extract_events(text, metadata)
 
 def get_extractor() -> LLMExtractor:
-    if settings.AI_PROVIDER in ["gemini", "openai"] and (settings.GEMINI_API_KEY or settings.OPENAI_API_KEY):
+    if settings.AI_PROVIDER != "fallback" and (settings.GEMINI_API_KEY or settings.OPENAI_API_KEY):
         return HostedLLMExtractor()
     return RuleBasedFallbackExtractor()
+

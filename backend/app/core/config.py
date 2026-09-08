@@ -7,6 +7,20 @@ DATA_DIR = os.path.join(ROOT_DIR, "data")
 UPLOADS_DIR = os.path.join(ROOT_DIR, "uploads")
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
+# Load .env file into environment
+env_file = os.path.join(ROOT_DIR, ".env")
+if os.path.exists(env_file):
+    with open(env_file, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                k = k.strip()
+                v = v.strip().strip('"').strip("'")
+                if k not in os.environ:
+                    os.environ[k] = v
+
+
 class Settings:
     PROJECT_NAME: str = "PRAGATI AI"
     API_V1_STR: str = "/api"
@@ -15,10 +29,20 @@ class Settings:
         raw_db = raw_db.replace("postgres://", "postgresql://", 1)
     DATABASE_URL: str = raw_db
     
-    # AI Provider Settings
-    AI_PROVIDER: str = os.getenv("AI_PROVIDER", "fallback")  # "fallback" or "gemini" or "openai"
-    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    # AI Provider Settings (auto-detects Gemini/OpenAI if key is present)
+    raw_provider = os.getenv("AI_PROVIDER", "").strip().lower()
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "").strip()
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "").strip()
+
+    if raw_provider in ["gemini", "openai", "fallback"]:
+        AI_PROVIDER: str = raw_provider
+    elif GEMINI_API_KEY:
+        AI_PROVIDER: str = "gemini"
+    elif OPENAI_API_KEY:
+        AI_PROVIDER: str = "openai"
+    else:
+        AI_PROVIDER: str = "fallback"
+
     
     # Matching Engine Weights
     WEIGHT_SEMANTIC: float = float(os.getenv("WEIGHT_SEMANTIC", "0.50"))
