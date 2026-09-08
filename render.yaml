@@ -11,9 +11,8 @@ services:
       - key: HOST
         value: 0.0.0.0
       - key: AI_PROVIDER
-        value: gemini
-      - key: GEMINI_API_KEY
-        sync: false
+        value: fallback
       - key: PYTHON_VERSION
         value: 3.11.9
+
 

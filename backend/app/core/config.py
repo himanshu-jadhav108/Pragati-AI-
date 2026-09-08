@@ -29,19 +29,16 @@ class Settings:
         raw_db = raw_db.replace("postgres://", "postgresql://", 1)
     DATABASE_URL: str = raw_db
     
-    # AI Provider Settings (auto-detects Gemini/OpenAI if key is present)
-    raw_provider = os.getenv("AI_PROVIDER", "").strip().lower()
+    # AI Provider Settings ("fallback" is primary, fully offline, and instant)
+    raw_provider = os.getenv("AI_PROVIDER", "fallback").strip().lower()
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "").strip()
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "").strip()
 
     if raw_provider in ["gemini", "openai", "fallback"]:
         AI_PROVIDER: str = raw_provider
-    elif GEMINI_API_KEY:
-        AI_PROVIDER: str = "gemini"
-    elif OPENAI_API_KEY:
-        AI_PROVIDER: str = "openai"
     else:
         AI_PROVIDER: str = "fallback"
+
 
     
     # Matching Engine Weights
