@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRAGATI AI — Planning-to-Execution Intelligence Layer</title>
+  <link rel="icon" type="image/png" href="/static/logo.png">
+  <link rel="apple-touch-icon" href="/static/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+  <!-- Top App Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <a href="/" class="brand-logo" title="PRAGATI AI Home">
+          <img src="/static/logo.png" alt="PRAGATI AI Logo" class="app-logo-img">
+        </a>
+        <div class="brand-text-wrap">
+          <div class="brand-title-row">
+            <h1 class="brand-title">PRAGATI AI</h1>
+            <span class="badge-tag">SIH26122</span>
+            <span class="badge-tag hide-on-mobile">Oil India Limited</span>
+          </div>
+          <p class="brand-subtitle">AI-Powered Planning-to-Execution Intelligence & Governance Layer</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="provider-pill">
+          <span class="status-dot"></span>
+          <span class="provider-pill-text">System: Operational</span>
+        </div>
+        <button class="btn btn-outline btn-sm reset-btn" onclick="triggerDemoReset()">
+          🔄 Reset Demo
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs Bar -->
+  <nav class="nav-tabs-bar">
+    <div class="nav-container">
+      <button class="nav-tab active" data-tab="overview">
+        📊 Executive Dashboard
+      </button>
+      <button class="nav-tab" data-tab="ingestion">
+        📥 Field DPR Ingestion
+      </button>
+      <button class="nav-tab" data-tab="review">
+        ⚖️ Planner Review Queue <span class="tab-badge" id="queue-count-badge">0</span>
+      </button>
+      <button class="nav-tab" data-tab="activities">
+        📋 Schedule Activities (L5/L6)
+      </button>
+      <button class="nav-tab" data-tab="audit">
+        📜 Governance Audit Trail
+      </button>
+      <button class="nav-tab" data-tab="system">
+        ⚙️ System Health & Info
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="main-content">
+
+    <!-- 1. TAB: EXECUTIVE DASHBOARD -->
+    <section id="tab-overview" class="tab-view active">
+      <!-- High Level Metrics -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Planned Progress</span>
+            <span class="metric-icon">📅</span>
+          </div>
+          <div class="metric-val" id="metric-planned">--%</div>
+          <div class="metric-sub">Approved baseline curve</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Actual Progress</span>
+            <span class="metric-icon">🏗️</span>
+          </div>
+          <div class="metric-val" id="metric-actual">--%</div>
+          <div class="metric-sub">Audited & committed</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Schedule Variance</span>
+            <span class="metric-icon">⚖️</span>
+          </div>
+          <div class="metric-val" id="metric-variance">--%</div>
+          <div class="metric-sub">Actual vs Planned gap</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Pending Reviews</span>
+            <span class="metric-icon">⏳</span>
+          </div>
+          <div class="metric-val" id="metric-pending" style="color:#0284c7;">--</div>
+          <div class="metric-sub">Awaiting planner approval</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">High Conf. Matches</span>
+            <span class="metric-icon">🎯</span>
+          </div>
+          <div class="metric-val" id="metric-high-matches" style="color:#16a34a;">--</div>
+          <div class="metric-sub">Corroborated top candidates</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Unmatched Events</span>
+            <span class="metric-icon">❓</span>
+          </div>
+          <div class="metric-val" id="metric-unmatched" style="color:#64748b;">--</div>
+          <div class="metric-sub">No schedule mutation</div>
+        </div>
+      </div>
+
+      <!-- S-Curve Chart & Status Breakdown -->
+      <div class="grid-2col">
+        <!-- Planned vs Actual Curve -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📈 S-Curve: Planned vs Actual Progress</h3>
+            <div style="display:flex; gap:1rem; font-size:0.75rem; font-weight:600;">
+              <span style="color:#0284c7;">-- Planned Baseline</span>
+              <span style="color:#0d9488;">— Actual Audited</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="scurve-chart" class="chart-container"></div>
+          </div>
+        </div>
+
+        <!-- Activity Status Breakdown -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📊 Schedule Activity Distribution</h3>
+          </div>
+          <div class="card-body">
+            <div style="margin-bottom:1.25rem;">
+              <div style="display:flex; justify-content:space-between; font-size:0.825rem; margin-bottom:0.35rem;">
+                <span>Completed Tasks</span>
+                <strong id="breakdown-completed">--</strong>
+              </div>
+              <div class="progress-bar-wrap">
+                <div id="bar-completed" class="progress-bar-fill" style="width:0%; background:#10b981;"></div>
+              </div>
+            </div>
+
+            <div style="margin-bottom:1.25rem;">
+              <div style="display:flex; justify-content:space-between; font-size:0.825rem; margin-bottom:0.35rem;">
+                <span>In Progress Tasks</span>
+                <strong id="breakdown-in-progress">--</strong>
+              </div>
+              <div class="progress-bar-wrap">
+                <div id="bar-in-progress" class="progress-bar-fill" style="width:0%; background:#f59e0b;"></div>
+              </div>
+            </div>
+
+            <div style="margin-bottom:1.25rem;">
+              <div style="display:flex; justify-content:space-between; font-size:0.825rem; margin-bottom:0.35rem;">
+                <span>Not Started</span>
+                <strong id="breakdown-not-started">--</strong>
+              </div>
+              <div class="progress-bar-wrap">
+                <div id="bar-not-started" class="progress-bar-fill" style="width:0%; background:#94a3b8;"></div>
+              </div>
+            </div>
+
+            <div style="background:#f8fafc; border-radius:6px; padding:0.75rem; font-size:0.75rem; color:#475569; margin-top:1rem;">
+              💡 <strong>Human Governance Rule:</strong> AI matches never mutate the schedule automatically. All progress updates require explicit planner validation.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Approved Updates Stream -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">⏱️ Recent Approved Schedule Updates</h3>
+          <button class="btn btn-outline btn-sm" onclick="switchTab('audit')">View Full Audit Trail</button>
+        </div>
+        <div class="card-body" id="recent-audits-list">
+          <p class="text-muted">Loading recent updates...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. TAB: FIELD DPR INGESTION -->
+    <section id="tab-ingestion" class="tab-view">
+      <div class="grid-2col">
+        <!-- Upload & Scenario Loader -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📤 Upload Daily Progress Report (DPR)</h3>
+          </div>
+          <div class="card-body">
+            <p style="font-size:0.85rem; color:#475569; margin-bottom:1rem;">
+              Upload raw DPR text files, PDFs, or CSV spreadsheets. The AI pipeline extracts structured field events without hallucinating schedule activity IDs.
+            </p>
+
+            <!-- File Upload Input -->
+            <div style="border:2px dashed #cbd5e1; border-radius:10px; padding:2rem; text-align:center; background:#f8fafc; margin-bottom:1.25rem;">
+              <input type="file" id="file-upload-input" accept=".txt,.pdf,.csv,.dpr" style="display:none;">
+              <button class="btn btn-primary" onclick="document.getElementById('file-upload-input').click()">
+                Select Document (.txt, .pdf, .csv)
+              </button>
+              <p style="font-size:0.75rem; color:#94a3b8; margin-top:0.5rem;">Maximum file size: 10MB</p>
+            </div>
+
+            <!-- Pre-loaded Demo Scenarios -->
+            <div style="border-top:1px solid #e2e8f0; padding-top:1rem;">
+              <h4 style="font-size:0.85rem; font-weight:700; margin-bottom:0.6rem; color:#0f172a;">
+                ⚡ Quick Demo Scenarios (One-Click)
+              </h4>
+              <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                <button class="btn btn-outline" style="justify-content:flex-start;" onclick="loadDemoScenario('hero')">
+                  🌟 <strong>Hero Case:</strong> Spool erection near V-105 (14 spools) &rarr; Expected HIGH Match
+                </button>
+                <button class="btn btn-outline" style="justify-content:flex-start;" onclick="loadDemoScenario('ambiguous')">
+                  ⚖️ <strong>Ambiguous Case:</strong> Suction line welding at PH-1 &rarr; Expected MEDIUM Match
+                </button>
+                <button class="btn btn-outline" style="justify-content:flex-start;" onclick="loadDemoScenario('unmatched')">
+                  🛑 <strong>Unmatched Case:</strong> Catering van delivery at gate 3 &rarr; Expected UNMATCHED
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ingestion Document Preview & Run Action -->
+        <div class="card" id="ingest-preview-card" style="display:none;">
+          <div class="card-header">
+            <h3 class="card-title">📄 Document Content Preview</h3>
+            <span class="badge-tag" id="ingest-doc-type">TXT</span>
+          </div>
+          <div class="card-body">
+            <h4 id="ingest-doc-title" style="font-size:0.9rem; margin-bottom:0.5rem; color:#0284c7;">--</h4>
+            <div class="dpr-preview-box" id="ingest-raw-text">--</div>
+            <div style="margin-top:1.25rem; display:flex; justify-content:flex-end;">
+              <button class="btn btn-success" onclick="runExtractionForCurrentDoc()">
+                🚀 Run Structured Event Extraction & Matching
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. TAB: PLANNER REVIEW QUEUE -->
+    <section id="tab-review" class="tab-view">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">⚖️ Human-in-the-Loop Review Queue</h3>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-outline btn-sm" onclick="loadReviewQueue()">All</button>
+            <button class="btn btn-outline btn-sm" onclick="loadReviewQueue('HIGH')">High Confidence</button>
+            <button class="btn btn-outline btn-sm" onclick="loadReviewQueue('MEDIUM')">Medium (Review)</button>
+            <button class="btn btn-outline btn-sm" onclick="loadReviewQueue('UNMATCHED')">Unmatched</button>
+          </div>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Confidence & Score</th>
+                <th>Extracted Field Event</th>
+                <th>AI Top Candidate Activity</th>
+                <th>Discipline</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="review-queue-body">
+              <tr><td colspan="7" style="text-align:center; padding:2rem;">Loading review items...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. TAB: SCHEDULE ACTIVITIES -->
+    <section id="tab-activities" class="tab-view">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">📋 L5/L6 Schedule Activity Master</h3>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-outline btn-sm" onclick="loadActivities()">All Disciplines</button>
+            <button class="btn btn-outline btn-sm" onclick="loadActivities('Piping')">Piping</button>
+            <button class="btn btn-outline btn-sm" onclick="loadActivities('Civil')">Civil</button>
+            <button class="btn btn-outline btn-sm" onclick="loadActivities('Mechanical')">Mechanical</button>
+            <button class="btn btn-outline btn-sm" onclick="loadActivities('Electrical')">Electrical</button>
+          </div>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Activity ID</th>
+                <th>Description</th>
+                <th>Discipline</th>
+                <th>Location</th>
+                <th>Planned Window</th>
+                <th>Progress (Actual / Plan)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="activities-table-body">
+              <tr><td colspan="7" style="text-align:center; padding:2rem;">Loading activities...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. TAB: AUDIT TRAIL -->
+    <section id="tab-audit" class="tab-view">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">📜 Immutable Governance & Decision Audit Trail</h3>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Action</th>
+                <th>Committed Activity</th>
+                <th>AI Recommendation</th>
+                <th>Progress State Change</th>
+                <th>Decided By</th>
+                <th>Notes / Audit Trace</th>
+              </tr>
+            </thead>
+            <tbody id="audit-trail-body">
+              <tr><td colspan="7" style="text-align:center; padding:2rem;">Loading audit logs...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. TAB: SYSTEM HEALTH & DEMO INFO -->
+    <section id="tab-system" class="tab-view">
+      <div class="grid-2col">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">⚙️ System Configuration & Health</h3>
+          </div>
+          <div class="card-body">
+            <div style="display:flex; flex-direction:column; gap:1rem; font-size:0.85rem;">
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid #f1f5f9; padding-bottom:0.5rem;">
+                <span style="color:#64748b;">Backend Status:</span>
+                <strong style="color:#16a34a;" id="health-backend">HEALTHY</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid #f1f5f9; padding-bottom:0.5rem;">
+                <span style="color:#64748b;">Database Connection:</span>
+                <strong style="color:#0284c7;" id="health-database">SQLITE / CONNECTED</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid #f1f5f9; padding-bottom:0.5rem;">
+                <span style="color:#64748b;">AI Extraction Engine:</span>
+                <strong id="health-ai-provider">Deterministic Offline Fallback</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid #f1f5f9; padding-bottom:0.5rem;">
+                <span style="color:#64748b;">Embedding Provider:</span>
+                <strong id="health-embedding-provider">Local TF-IDF Vector Space</strong>
+              </div>
+            </div>
+            <div style="margin-top:1.5rem;">
+              <button class="btn btn-outline" onclick="triggerDemoReset()">
+                🔄 Reset Demo to Clean Baseline State
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📐 Multi-Signal Scoring Weights</h3>
+          </div>
+          <div class="card-body">
+            <p style="font-size:0.8rem; color:#64748b; margin-bottom:1rem;">
+              PRAGATI AI evaluates candidates across multiple orthogonal dimensions rather than relying solely on black-box LLM predictions:
+            </p>
+            <div class="score-row">
+              <span class="score-name">Semantic Similarity</span>
+              <span class="score-val" style="color:#0284c7;">50%</span>
+            </div>
+            <div class="score-row">
+              <span class="score-name">Discipline Match</span>
+              <span class="score-val" style="color:#0284c7;">15%</span>
+            </div>
+            <div class="score-row">
+              <span class="score-name">Entity / Equipment Tag</span>
+              <span class="score-val" style="color:#0284c7;">15%</span>
+            </div>
+            <div class="score-row">
+              <span class="score-name">Location / Area Match</span>
+              <span class="score-val" style="color:#0284c7;">10%</span>
+            </div>
+            <div class="score-row">
+              <span class="score-name">Schedule Temporal Window</span>
+              <span class="score-val" style="color:#0284c7;">10%</span>
+            </div>
+            <div style="margin-top:1rem; padding:0.75rem; background:#fee2e2; border-radius:6px; font-size:0.75rem; color:#991b1b;">
+              ⚠️ <strong>Contradiction Overrides:</strong> Strong clashes (e.g. location conflict, shop fabrication vs field erection) apply negative penalties that prevent false positive matching.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Split-Screen Review Inspection Modal -->
+  <div class="modal-backdrop" id="review-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">🔍 Planner Review Workstation (Split Inspection)</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeReviewModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="workstation-split">
+          <!-- Left Column: Source Evidence -->
+          <div>
+            <h4 style="font-size:0.875rem; font-weight:700; color:#0f172a; margin-bottom:0.5rem;">
+              Source Evidence (<span id="modal-doc-name">--</span>)
+            </h4>
+            <div class="evidence-box">
+              <strong>Extracted Evidence Snippet:</strong>
+              <div id="modal-evidence-text" style="font-style:italic; margin-top:0.25rem;">--</div>
+            </div>
+            <h5 style="font-size:0.8rem; font-weight:600; color:#475569; margin-top:1rem; margin-bottom:0.35rem;">Full Document Context:</h5>
+            <div class="dpr-preview-box" id="modal-raw-doc-text" style="max-height:200px;">--</div>
+          </div>
+
+          <!-- Right Column: Extracted Metadata & Candidate Activities -->
+          <div>
+            <h4 style="font-size:0.875rem; font-weight:700; color:#0f172a; margin-bottom:0.5rem;">
+              Extracted Facts
+            </h4>
+            <div id="modal-extracted-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; font-size:0.8rem; background:#f8fafc; padding:0.75rem; border-radius:6px; border:1px solid #e2e8f0; margin-bottom:1rem;">
+            </div>
+
+            <h4 style="font-size:0.875rem; font-weight:700; color:#0f172a; margin-bottom:0.5rem;">
+              Top-K Candidate Activities & Multi-Signal Scoring
+            </h4>
+            <div id="modal-candidates-list">
+              <!-- Rendered candidates -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" id="modal-actions-bar">
+        <!-- Actions rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Candidate Edit & Override Modal -->
+  <div class="modal-backdrop" id="edit-modal">
+    <div class="modal-content" style="max-width:550px;">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Edit & Planner Override</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeEditModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:0.35rem;">Target Activity Selection:</label>
+          <select id="edit-override-activity" style="width:100%; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1; font-size:0.85rem;">
+          </select>
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:0.35rem;">Actual Progress Percent (%):</label>
+          <input type="number" id="edit-override-progress" min="0" max="100" style="width:100%; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1; font-size:0.85rem;" value="100">
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:0.35rem;">Planner Audit Notes:</label>
+          <textarea id="edit-override-notes" rows="3" style="width:100%; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1; font-size:0.85rem;" placeholder="Reason for activity re-assignment..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitEditAndApprove()">Commit Edited Update</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

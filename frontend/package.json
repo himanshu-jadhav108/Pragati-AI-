@@ -1,0 +1,12 @@
+{
+  "name": "pragati-ai-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PRAGATI AI - Enterprise Planner Workstation Frontend (SIH26122 - Oil India Limited)",
+  "scripts": {
+    "dev": "echo 'Frontend is served directly by the FastAPI backend at http://localhost:8000 for seamless zero-dependency operation. Run python run.py to launch.'",
+    "start": "python ../run.py"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
