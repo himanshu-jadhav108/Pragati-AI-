@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: pragati-ai
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python scripts/generate_dataset.py && python scripts/seed_demo.py"
+    startCommand: "python run.py"
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: HOST
+        value: 0.0.0.0
+      - key: AI_PROVIDER
+        value: fallback
+      - key: PYTHON_VERSION
+        value: 3.11.9
