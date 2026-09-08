@@ -1,0 +1,21 @@
+wbs_id,name,level,parent_id
+1,DNPE Project,1,
+1.1,Pipeline Trunk Line,2,1
+1.2,Pumping Station Upgrades,2,1
+1.3,Terminal & Metering Facility,2,1
+1.1.1,Right of Way & Trenching,3,1.1
+1.1.2,Mainline Piping & Welding,3,1.1
+1.1.3,Crossing & Valve Stations,3,1.1
+1.2.1,PH-1 Civil Foundations,3,1.2
+1.2.2,PH-1 Mechanical Equipment,3,1.2
+1.2.3,PH-1 Piping & Spooling,3,1.2
+1.2.4,Electrical & Instrumentation,3,1.2
+1.3.1,Metering Skids & Manifolds,3,1.3
+1.3.2,Storage Tanks & Dykes,3,1.3
+1.2.3.1,High Pressure Piping Systems,4,1.2.3
+1.2.3.1.1,Section 24-inch Spool Erection,5,1.2.3.1
+1.2.3.1.2,Section 16-inch Suction Piping,5,1.2.3.1
+1.2.1.1,Equipment Foundation Concrete,4,1.2.1
+1.2.1.1.1,Heavy Pump Foundations,5,1.2.1.1
+1.2.4.1,Field Instruments Installation,4,1.2.4
+1.2.4.1.1,Pressure & Flow Transmitters,5,1.2.4.1

@@ -1,0 +1,5 @@
+event_id,doc_filename,raw_text,expected_activity_id,expected_confidence,expected_discipline,expected_location,expected_quantity,expected_unit,expected_status,scenario
+EVT-HERO-001,DPR-OIL-2026-0308-01.txt,Spool erection near V-105 completed today. 14 spools installed.,PIP-L6-0427,HIGH,Piping,V-105,14.0,spools,COMPLETED,HERO_SUCCESS
+EVT-AMBIG-002,DPR-OIL-2026-0218-02.txt,Suction line welding in progress at Pump House PH-1. Completed fit-up and weld for 4 joints today.,PIP-L6-0501,MEDIUM,Piping,Pump House PH-1,4.0,joints,IN_PROGRESS,AMBIGUOUS_CHOICE
+EVT-UNMATCH-003,DPR-OIL-2026-0302-03.txt,Catering supply van arrived at main gate 3 with provisions for the worker mess.,,UNMATCHED,,main gate 3,,,UNKNOWN,NO_MATCH
+EVT-SYNONYM-004,DPR-OIL-2026-0305-04.txt,High pressure piping spool installation done near V-105. All 14 pieces mounted and bolted.,PIP-L6-0427,HIGH,Piping,V-105,14.0,pieces,COMPLETED,SYNONYM_PHRASING

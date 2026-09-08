@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  pragati-ai:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./pragati_ai.db
+      - AI_PROVIDER=fallback
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads

@@ -1,0 +1,166 @@
+activity_id,wbs_id,description,discipline,location,equipment_id,planned_start,planned_finish,planned_progress,actual_progress,actual_start,actual_finish,target_quantity,actual_quantity,unit,status
+PIP-L6-0427,1.2.3.1.1,Erect Line 24-inch near V-105,Piping,V-105,V-105,2026-03-01,2026-03-15,100.0,0.0,,,14.0,0.0,spools,NOT_STARTED
+PIP-L6-0501,1.2.3.1.2,Fit-up and weld 16-inch suction line at Pump P-101A,Piping,Pump House PH-1,P-101A,2026-02-10,2026-02-25,100.0,50.0,2026-02-11,,8.0,4.0,joints,IN_PROGRESS
+PIP-L6-0502,1.2.3.1.2,Fit-up and weld 16-inch suction line at Pump P-101B,Piping,Pump House PH-1,P-101B,2026-02-15,2026-03-02,100.0,0.0,,,8.0,0.0,joints,NOT_STARTED
+CIV-L6-0112,1.2.1.1.1,Pour RCC foundation for Booster Pump P-101A,Civil,Pump House PH-1,P-101A,2026-01-20,2026-02-05,100.0,100.0,2026-01-22,2026-02-04,45.0,45.0,cum,COMPLETED
+CIV-L6-0113,1.2.1.1.1,Pour RCC foundation for Booster Pump P-101B,Civil,Pump House PH-1,P-101B,2026-01-25,2026-02-10,100.0,100.0,2026-01-27,2026-02-09,45.0,45.0,cum,COMPLETED
+PIP-L6-1001,1.2.3.1,Hydrostatic testing of Line 8-inch near V-105,Piping,V-105,FIT-204,2026-01-18,2026-02-02,100.0,100.0,2026-01-17,2026-02-02,25.0,25.0,joints,COMPLETED
+PIP-L6-1002,1.2.3.1,Hydrostatic testing of Line 8-inch near V-102,Piping,V-102,PIT-108,2026-03-25,2026-04-03,18.4,0.0,,,47.0,0.0,joints,NOT_STARTED
+PIP-L6-1003,1.2.3.1,Hydrostatic testing of Line 8-inch near Pump House PH-1,Piping,Pump House PH-1,V-105,2026-02-11,2026-02-25,100.0,100.0,2026-02-13,2026-02-24,42.0,42.0,joints,COMPLETED
+PIP-L6-1004,1.2.3.1,Hydrostatic testing of Line 12-inch near Pump House PH-2,Piping,Pump House PH-2,VS-04,2026-03-25,2026-04-14,19.0,0.0,,,24.0,0.0,joints,NOT_STARTED
+PIP-L6-1005,1.2.3.1,Hydrostatic testing of Line 8-inch near Compressor Shed CS-A,Piping,Compressor Shed CS-A,K-201,2026-02-04,2026-02-24,100.0,100.0,2026-02-04,2026-02-24,31.0,31.0,joints,COMPLETED
+PIP-L6-1006,1.2.3.1,Hydrostatic testing of Line 16-inch near Tank Farm TF-3,Piping,Tank Farm TF-3,P-101B,2026-01-28,2026-02-06,100.0,100.0,2026-01-26,2026-02-07,34.0,34.0,joints,COMPLETED
+PIP-L6-1007,1.2.3.1,Hydrostatic testing of Line 30-inch near Scraper Station SS-01,Piping,Scraper Station SS-01,TK-301,2026-02-17,2026-02-25,100.0,100.0,2026-02-19,2026-02-24,39.0,39.0,joints,COMPLETED
+PIP-L6-1008,1.2.3.1,Hydrostatic testing of Line 8-inch near Metering Skid MS-02,Piping,Metering Skid MS-02,TK-302,2026-03-26,2026-04-11,22.4,0.0,,,50.0,0.0,joints,NOT_STARTED
+PIP-L6-1009,1.2.3.1.2,Erection and torqueing of flange joints on TK-301,Piping,V-105,TK-301,2026-02-08,2026-02-17,100.0,100.0,2026-02-11,2026-02-17,5.0,5.0,joints,COMPLETED
+PIP-L6-1010,1.2.3.1.2,Erection and torqueing of flange joints on K-201,Piping,V-102,K-201,2026-02-13,2026-02-23,100.0,100.0,2026-02-13,2026-02-25,16.0,16.0,joints,COMPLETED
+PIP-L6-1011,1.2.3.1.2,Erection and torqueing of flange joints on FIT-204,Piping,Pump House PH-1,FIT-204,2026-02-04,2026-02-22,100.0,100.0,2026-02-03,2026-02-26,15.0,15.0,joints,COMPLETED
+PIP-L6-1012,1.2.3.1.2,Erection and torqueing of flange joints on K-201,Piping,Pump House PH-2,K-201,2026-02-05,2026-03-01,47.4,34.7,2026-02-05,,11.0,3.8,joints,IN_PROGRESS
+PIP-L6-1013,1.2.3.1.2,Erection and torqueing of flange joints on FIT-204,Piping,Compressor Shed CS-A,FIT-204,2026-02-12,2026-03-12,77.9,67.9,2026-02-12,,14.0,9.5,joints,IN_PROGRESS
+PIP-L6-1014,1.2.3.1.2,Erection and torqueing of flange joints on P-101B,Piping,Tank Farm TF-3,P-101B,2026-02-24,2026-03-15,43.0,39.5,2026-02-24,,12.0,4.7,joints,IN_PROGRESS
+PIP-L6-1015,1.2.3.1.2,Erection and torqueing of flange joints on MOT-101,Piping,Scraper Station SS-01,MOT-101,2026-02-11,2026-03-10,57.8,53.2,2026-02-11,,19.0,10.1,joints,IN_PROGRESS
+PIP-L6-1016,1.2.3.1.2,Erection and torqueing of flange joints on SK-01,Piping,Metering Skid MS-02,SK-01,2026-02-17,2026-02-28,73.5,58.0,2026-02-17,,11.0,6.4,joints,IN_PROGRESS
+PIP-L6-1017,1.2.3.1.1,Installation of 24-inch tie-in spool at V-105,Piping,V-105,PIT-108,2026-03-10,2026-04-04,17.2,0.0,,,8.0,0.0,spools,NOT_STARTED
+PIP-L6-1018,1.2.3.1.1,Installation of 24-inch tie-in spool at V-102,Piping,V-102,P-101A,2026-03-19,2026-03-28,27.2,0.0,,,2.0,0.0,spools,NOT_STARTED
+PIP-L6-1019,1.2.3.1.1,Installation of 24-inch tie-in spool at Pump House PH-1,Piping,Pump House PH-1,P-101A,2026-03-10,2026-04-05,17.7,0.0,,,3.0,0.0,spools,NOT_STARTED
+PIP-L6-1020,1.2.3.1.1,Installation of 24-inch tie-in spool at Pump House PH-2,Piping,Pump House PH-2,MOT-101,2026-03-23,2026-04-07,27.2,0.0,,,10.0,0.0,spools,NOT_STARTED
+PIP-L6-1021,1.2.3.1.1,Installation of 24-inch tie-in spool at Compressor Shed CS-A,Piping,Compressor Shed CS-A,V-105,2026-03-24,2026-04-08,12.2,0.0,,,7.0,0.0,spools,NOT_STARTED
+PIP-L6-1022,1.2.3.1.1,Installation of 24-inch tie-in spool at Tank Farm TF-3,Piping,Tank Farm TF-3,TK-302,2026-03-14,2026-03-21,29.4,0.0,,,6.0,0.0,spools,NOT_STARTED
+PIP-L6-1023,1.2.3.1.1,Installation of 24-inch tie-in spool at Scraper Station SS-01,Piping,Scraper Station SS-01,P-101A,2026-01-28,2026-02-24,100.0,100.0,2026-01-31,2026-02-27,6.0,6.0,spools,COMPLETED
+PIP-L6-1024,1.2.3.1.1,Installation of 24-inch tie-in spool at Metering Skid MS-02,Piping,Metering Skid MS-02,MOT-101,2026-02-03,2026-02-21,100.0,100.0,2026-02-05,2026-02-26,4.0,4.0,spools,COMPLETED
+PIP-L6-1025,1.2.3.1,Field weld fit-up on VS-04 header line,Piping,V-105,VS-04,2026-02-25,2026-03-19,45.0,32.7,2026-02-25,,6.0,2.0,joints,IN_PROGRESS
+PIP-L6-1026,1.2.3.1,Field weld fit-up on K-201 header line,Piping,V-102,K-201,2026-01-22,2026-02-05,100.0,100.0,2026-01-24,2026-02-04,20.0,20.0,joints,COMPLETED
+PIP-L6-1027,1.2.3.1,Field weld fit-up on V-102 header line,Piping,Pump House PH-1,V-102,2026-01-23,2026-02-16,100.0,100.0,2026-01-22,2026-02-16,18.0,18.0,joints,COMPLETED
+PIP-L6-1028,1.2.3.1,Field weld fit-up on FIT-204 header line,Piping,Pump House PH-2,FIT-204,2026-03-26,2026-04-07,20.6,0.0,,,10.0,0.0,joints,NOT_STARTED
+PIP-L6-1029,1.2.3.1,Field weld fit-up on MOT-101 header line,Piping,Compressor Shed CS-A,MOT-101,2026-02-11,2026-03-07,72.8,48.8,2026-02-11,,18.0,8.8,joints,IN_PROGRESS
+PIP-L6-1030,1.2.3.1,Field weld fit-up on K-201 header line,Piping,Tank Farm TF-3,K-201,2026-03-03,2026-03-24,63.3,40.7,2026-03-03,,20.0,8.1,joints,IN_PROGRESS
+PIP-L6-1031,1.2.3.1,Field weld fit-up on P-101B header line,Piping,Scraper Station SS-01,P-101B,2026-02-27,2026-03-06,64.9,52.3,2026-02-27,,15.0,7.8,joints,IN_PROGRESS
+PIP-L6-1032,1.2.3.1,Field weld fit-up on V-105 header line,Piping,Metering Skid MS-02,V-105,2026-01-22,2026-02-05,100.0,100.0,2026-01-20,2026-02-10,7.0,7.0,joints,COMPLETED
+CIV-L6-1033,1.1.1,Excavation and backfilling for pipeline trench at V-105,Civil,V-105,TK-301,2026-03-21,2026-04-04,23.4,0.0,,,192.0,0.0,m,NOT_STARTED
+CIV-L6-1034,1.1.1,Excavation and backfilling for pipeline trench at V-102,Civil,V-102,P-101B,2026-01-31,2026-02-25,100.0,100.0,2026-02-01,2026-02-25,345.0,345.0,m,COMPLETED
+CIV-L6-1035,1.1.1,Excavation and backfilling for pipeline trench at Pump House PH-1,Civil,Pump House PH-1,SK-01,2026-02-08,2026-02-18,100.0,100.0,2026-02-11,2026-02-20,99.0,99.0,m,COMPLETED
+CIV-L6-1036,1.1.1,Excavation and backfilling for pipeline trench at Pump House PH-2,Civil,Pump House PH-2,TK-301,2026-03-08,2026-03-29,24.6,0.0,,,492.0,0.0,m,NOT_STARTED
+CIV-L6-1037,1.1.1,Excavation and backfilling for pipeline trench at Compressor Shed CS-A,Civil,Compressor Shed CS-A,FIT-204,2026-01-22,2026-02-10,100.0,100.0,2026-01-22,2026-02-15,422.0,422.0,m,COMPLETED
+CIV-L6-1038,1.1.1,Excavation and backfilling for pipeline trench at Tank Farm TF-3,Civil,Tank Farm TF-3,V-102,2026-02-08,2026-02-21,100.0,100.0,2026-02-09,2026-02-21,324.0,324.0,m,COMPLETED
+CIV-L6-1039,1.1.1,Excavation and backfilling for pipeline trench at Scraper Station SS-01,Civil,Scraper Station SS-01,TK-302,2026-02-19,2026-03-12,79.4,49.7,2026-02-19,,177.0,88.0,m,IN_PROGRESS
+CIV-L6-1040,1.1.1,Excavation and backfilling for pipeline trench at Metering Skid MS-02,Civil,Metering Skid MS-02,VS-04,2026-01-21,2026-02-17,100.0,100.0,2026-01-19,2026-02-16,326.0,326.0,m,COMPLETED
+CIV-L6-1041,1.1.3,Construction of RCC valve pit enclosure at V-105,Civil,V-105,P-101B,2026-03-08,2026-03-30,14.3,0.0,,,2.0,0.0,units,NOT_STARTED
+CIV-L6-1042,1.1.3,Construction of RCC valve pit enclosure at V-102,Civil,V-102,TK-302,2026-02-05,2026-02-24,100.0,100.0,2026-02-06,2026-02-25,1.0,1.0,units,COMPLETED
+CIV-L6-1043,1.1.3,Construction of RCC valve pit enclosure at Pump House PH-1,Civil,Pump House PH-1,SK-01,2026-03-10,2026-04-03,24.4,0.0,,,3.0,0.0,units,NOT_STARTED
+CIV-L6-1044,1.1.3,Construction of RCC valve pit enclosure at Pump House PH-2,Civil,Pump House PH-2,P-101A,2026-02-21,2026-03-06,66.1,52.2,2026-02-21,,1.0,0.5,units,IN_PROGRESS
+CIV-L6-1045,1.1.3,Construction of RCC valve pit enclosure at Compressor Shed CS-A,Civil,Compressor Shed CS-A,PIT-108,2026-01-22,2026-01-30,100.0,100.0,2026-01-23,2026-02-02,3.0,3.0,units,COMPLETED
+CIV-L6-1046,1.1.3,Construction of RCC valve pit enclosure at Tank Farm TF-3,Civil,Tank Farm TF-3,VS-04,2026-01-22,2026-02-14,100.0,100.0,2026-01-21,2026-02-13,1.0,1.0,units,COMPLETED
+CIV-L6-1047,1.1.3,Construction of RCC valve pit enclosure at Scraper Station SS-01,Civil,Scraper Station SS-01,MOT-101,2026-02-14,2026-03-05,82.4,65.9,2026-02-14,,1.0,0.7,units,IN_PROGRESS
+CIV-L6-1048,1.1.3,Construction of RCC valve pit enclosure at Metering Skid MS-02,Civil,Metering Skid MS-02,MOT-101,2026-01-20,2026-02-15,100.0,100.0,2026-01-21,2026-02-19,1.0,1.0,units,COMPLETED
+CIV-L6-1049,1.2.1.1,Placing rebar reinforcement for equipment pad MOT-101,Civil,V-105,MOT-101,2026-03-22,2026-04-08,14.1,0.0,,,13.0,0.0,tonnes,NOT_STARTED
+CIV-L6-1050,1.2.1.1,Placing rebar reinforcement for equipment pad PIT-108,Civil,V-102,PIT-108,2026-02-14,2026-03-01,45.9,37.9,2026-02-14,,17.0,6.4,tonnes,IN_PROGRESS
+CIV-L6-1051,1.2.1.1,Placing rebar reinforcement for equipment pad SK-01,Civil,Pump House PH-1,SK-01,2026-01-24,2026-01-31,100.0,100.0,2026-01-26,2026-02-03,19.0,19.0,tonnes,COMPLETED
+CIV-L6-1052,1.2.1.1,Placing rebar reinforcement for equipment pad V-102,Civil,Pump House PH-2,V-102,2026-03-24,2026-04-06,15.3,0.0,,,21.0,0.0,tonnes,NOT_STARTED
+CIV-L6-1053,1.2.1.1,Placing rebar reinforcement for equipment pad TK-301,Civil,Compressor Shed CS-A,TK-301,2026-02-15,2026-03-05,47.1,42.0,2026-02-15,,14.0,5.9,tonnes,IN_PROGRESS
+CIV-L6-1054,1.2.1.1,Placing rebar reinforcement for equipment pad PIT-108,Civil,Tank Farm TF-3,PIT-108,2026-03-23,2026-03-30,26.3,0.0,,,26.0,0.0,tonnes,NOT_STARTED
+CIV-L6-1055,1.2.1.1,Placing rebar reinforcement for equipment pad K-201,Civil,Scraper Station SS-01,K-201,2026-02-01,2026-02-16,100.0,100.0,2026-01-30,2026-02-20,8.0,8.0,tonnes,COMPLETED
+CIV-L6-1056,1.2.1.1,Placing rebar reinforcement for equipment pad VS-04,Civil,Metering Skid MS-02,VS-04,2026-02-18,2026-03-06,49.5,35.6,2026-02-18,,24.0,8.5,tonnes,IN_PROGRESS
+CIV-L6-1057,1.2.1,Cable trench concrete lining works at V-105,Civil,V-105,FIT-204,2026-03-20,2026-04-11,28.1,0.0,,,84.0,0.0,m,NOT_STARTED
+CIV-L6-1058,1.2.1,Cable trench concrete lining works at V-102,Civil,V-102,V-105,2026-03-10,2026-03-25,10.1,0.0,,,31.0,0.0,m,NOT_STARTED
+CIV-L6-1059,1.2.1,Cable trench concrete lining works at Pump House PH-1,Civil,Pump House PH-1,P-101A,2026-02-04,2026-02-25,100.0,100.0,2026-02-07,2026-02-27,161.0,161.0,m,COMPLETED
+CIV-L6-1060,1.2.1,Cable trench concrete lining works at Pump House PH-2,Civil,Pump House PH-2,VS-04,2026-01-29,2026-02-07,100.0,100.0,2026-01-28,2026-02-10,196.0,196.0,m,COMPLETED
+CIV-L6-1061,1.2.1,Cable trench concrete lining works at Compressor Shed CS-A,Civil,Compressor Shed CS-A,V-105,2026-03-30,2026-04-23,18.6,0.0,,,57.0,0.0,m,NOT_STARTED
+CIV-L6-1062,1.2.1,Cable trench concrete lining works at Tank Farm TF-3,Civil,Tank Farm TF-3,V-105,2026-03-02,2026-03-10,49.5,34.0,2026-03-02,,111.0,37.7,m,IN_PROGRESS
+CIV-L6-1063,1.2.1,Cable trench concrete lining works at Scraper Station SS-01,Civil,Scraper Station SS-01,V-102,2026-03-27,2026-04-16,25.0,0.0,,,178.0,0.0,m,NOT_STARTED
+CIV-L6-1064,1.2.1,Cable trench concrete lining works at Metering Skid MS-02,Civil,Metering Skid MS-02,P-101B,2026-02-06,2026-02-26,100.0,100.0,2026-02-05,2026-03-02,26.0,26.0,m,COMPLETED
+MEC-L6-1065,1.2.2,Alignment and leveling of centrifugal pump TK-301,Mechanical,V-105,TK-301,2026-02-15,2026-03-02,75.4,48.1,2026-02-15,,1.0,0.5,units,IN_PROGRESS
+MEC-L6-1066,1.2.2,Alignment and leveling of centrifugal pump V-105,Mechanical,V-102,V-105,2026-02-12,2026-02-25,100.0,100.0,2026-02-12,2026-02-26,2.0,2.0,units,COMPLETED
+MEC-L6-1067,1.2.2,Alignment and leveling of centrifugal pump P-101B,Mechanical,Pump House PH-1,P-101B,2026-01-18,2026-02-15,100.0,100.0,2026-01-19,2026-02-16,1.0,1.0,units,COMPLETED
+MEC-L6-1068,1.2.2,Alignment and leveling of centrifugal pump K-201,Mechanical,Pump House PH-2,K-201,2026-02-19,2026-03-09,70.6,63.2,2026-02-19,,2.0,1.3,units,IN_PROGRESS
+MEC-L6-1069,1.2.2,Alignment and leveling of centrifugal pump TK-301,Mechanical,Compressor Shed CS-A,TK-301,2026-01-29,2026-02-13,100.0,100.0,2026-01-31,2026-02-14,1.0,1.0,units,COMPLETED
+MEC-L6-1070,1.2.2,Alignment and leveling of centrifugal pump V-105,Mechanical,Tank Farm TF-3,V-105,2026-03-11,2026-03-29,18.7,0.0,,,2.0,0.0,units,NOT_STARTED
+MEC-L6-1071,1.2.2,Alignment and leveling of centrifugal pump VS-04,Mechanical,Scraper Station SS-01,VS-04,2026-03-05,2026-03-30,51.5,43.7,2026-03-05,,1.0,0.4,units,IN_PROGRESS
+MEC-L6-1072,1.2.2,Alignment and leveling of centrifugal pump V-105,Mechanical,Metering Skid MS-02,V-105,2026-03-24,2026-04-21,17.3,0.0,,,1.0,0.0,units,NOT_STARTED
+MEC-L6-1073,1.1.3,Installation of pig launcher barrel at V-105,Mechanical,V-105,V-102,2026-02-24,2026-03-24,72.4,51.1,2026-02-24,,1.0,0.5,units,IN_PROGRESS
+MEC-L6-1074,1.1.3,Installation of pig launcher barrel at V-102,Mechanical,V-102,K-201,2026-02-25,2026-03-16,64.9,43.3,2026-02-25,,1.0,0.4,units,IN_PROGRESS
+MEC-L6-1075,1.1.3,Installation of pig launcher barrel at Pump House PH-1,Mechanical,Pump House PH-1,FIT-204,2026-02-06,2026-03-04,58.3,52.0,2026-02-06,,1.0,0.5,units,IN_PROGRESS
+MEC-L6-1076,1.1.3,Installation of pig launcher barrel at Pump House PH-2,Mechanical,Pump House PH-2,K-201,2026-02-10,2026-03-02,60.9,46.0,2026-02-10,,1.0,0.5,units,IN_PROGRESS
+MEC-L6-1077,1.1.3,Installation of pig launcher barrel at Compressor Shed CS-A,Mechanical,Compressor Shed CS-A,P-101B,2026-03-16,2026-03-28,15.7,0.0,,,1.0,0.0,units,NOT_STARTED
+MEC-L6-1078,1.1.3,Installation of pig launcher barrel at Tank Farm TF-3,Mechanical,Tank Farm TF-3,FIT-204,2026-02-26,2026-03-07,70.3,47.7,2026-02-26,,1.0,0.5,units,IN_PROGRESS
+MEC-L6-1079,1.1.3,Installation of pig launcher barrel at Scraper Station SS-01,Mechanical,Scraper Station SS-01,P-101B,2026-01-18,2026-01-26,100.0,100.0,2026-01-19,2026-01-29,1.0,1.0,units,COMPLETED
+MEC-L6-1080,1.1.3,Installation of pig launcher barrel at Metering Skid MS-02,Mechanical,Metering Skid MS-02,V-102,2026-03-09,2026-04-05,24.4,0.0,,,1.0,0.0,units,NOT_STARTED
+MEC-L6-1081,1.2.2,Mounting of electric drive motor on TK-302,Mechanical,V-105,TK-302,2026-03-07,2026-03-21,23.1,0.0,,,1.0,0.0,units,NOT_STARTED
+MEC-L6-1082,1.2.2,Mounting of electric drive motor on V-105,Mechanical,V-102,V-105,2026-03-10,2026-03-24,26.1,0.0,,,1.0,0.0,units,NOT_STARTED
+MEC-L6-1083,1.2.2,Mounting of electric drive motor on PIT-108,Mechanical,Pump House PH-1,PIT-108,2026-03-15,2026-03-23,28.3,0.0,,,1.0,0.0,units,NOT_STARTED
+MEC-L6-1084,1.2.2,Mounting of electric drive motor on V-102,Mechanical,Pump House PH-2,V-102,2026-02-01,2026-02-22,100.0,100.0,2026-02-02,2026-02-25,2.0,2.0,units,COMPLETED
+MEC-L6-1085,1.2.2,Mounting of electric drive motor on PIT-108,Mechanical,Compressor Shed CS-A,PIT-108,2026-03-10,2026-04-03,27.9,0.0,,,2.0,0.0,units,NOT_STARTED
+MEC-L6-1086,1.2.2,Mounting of electric drive motor on PIT-108,Mechanical,Tank Farm TF-3,PIT-108,2026-03-13,2026-03-28,26.8,0.0,,,1.0,0.0,units,NOT_STARTED
+MEC-L6-1087,1.2.2,Mounting of electric drive motor on K-201,Mechanical,Scraper Station SS-01,K-201,2026-03-18,2026-04-14,15.5,0.0,,,1.0,0.0,units,NOT_STARTED
+MEC-L6-1088,1.2.2,Mounting of electric drive motor on V-102,Mechanical,Metering Skid MS-02,V-102,2026-02-14,2026-03-01,54.4,42.9,2026-02-14,,2.0,0.9,units,IN_PROGRESS
+MEC-L6-1089,1.3.2,Internal inspection and boxing up of vessel P-101A,Mechanical,V-105,P-101A,2026-02-13,2026-03-04,71.8,44.7,2026-02-13,,1.0,0.4,units,IN_PROGRESS
+MEC-L6-1090,1.3.2,Internal inspection and boxing up of vessel TK-302,Mechanical,V-102,TK-302,2026-03-25,2026-04-15,11.2,0.0,,,1.0,0.0,units,NOT_STARTED
+MEC-L6-1091,1.3.2,Internal inspection and boxing up of vessel TK-302,Mechanical,Pump House PH-1,TK-302,2026-03-30,2026-04-06,19.5,0.0,,,1.0,0.0,units,NOT_STARTED
+MEC-L6-1092,1.3.2,Internal inspection and boxing up of vessel TK-301,Mechanical,Pump House PH-2,TK-301,2026-03-05,2026-03-25,62.0,43.1,2026-03-05,,1.0,0.4,units,IN_PROGRESS
+MEC-L6-1093,1.3.2,Internal inspection and boxing up of vessel SK-01,Mechanical,Compressor Shed CS-A,SK-01,2026-03-05,2026-03-22,72.6,64.9,2026-03-05,,1.0,0.6,units,IN_PROGRESS
+MEC-L6-1094,1.3.2,Internal inspection and boxing up of vessel P-101A,Mechanical,Tank Farm TF-3,P-101A,2026-03-24,2026-03-31,21.8,0.0,,,1.0,0.0,units,NOT_STARTED
+MEC-L6-1095,1.3.2,Internal inspection and boxing up of vessel FIT-204,Mechanical,Scraper Station SS-01,FIT-204,2026-01-25,2026-02-21,100.0,100.0,2026-01-24,2026-02-26,1.0,1.0,units,COMPLETED
+MEC-L6-1096,1.3.2,Internal inspection and boxing up of vessel SK-01,Mechanical,Metering Skid MS-02,SK-01,2026-01-21,2026-02-05,100.0,100.0,2026-01-21,2026-02-05,1.0,1.0,units,COMPLETED
+ELE-L6-1097,1.2.4,Laying 11kV HT power cable from V-105 to SK-01,Electrical,V-105,SK-01,2026-02-27,2026-03-18,73.8,65.8,2026-02-27,,669.0,440.2,m,IN_PROGRESS
+ELE-L6-1098,1.2.4,Laying 11kV HT power cable from V-102 to K-201,Electrical,V-102,K-201,2026-03-16,2026-03-23,30.0,0.0,,,206.0,0.0,m,NOT_STARTED
+ELE-L6-1099,1.2.4,Laying 11kV HT power cable from Pump House PH-1 to TK-301,Electrical,Pump House PH-1,TK-301,2026-01-23,2026-02-19,100.0,100.0,2026-01-21,2026-02-19,182.0,182.0,m,COMPLETED
+ELE-L6-1100,1.2.4,Laying 11kV HT power cable from Pump House PH-2 to P-101B,Electrical,Pump House PH-2,P-101B,2026-02-03,2026-02-17,100.0,100.0,2026-02-04,2026-02-21,358.0,358.0,m,COMPLETED
+ELE-L6-1101,1.2.4,Laying 11kV HT power cable from Compressor Shed CS-A to V-102,Electrical,Compressor Shed CS-A,V-102,2026-02-11,2026-03-04,74.5,49.1,2026-02-11,,624.0,306.4,m,IN_PROGRESS
+ELE-L6-1102,1.2.4,Laying 11kV HT power cable from Tank Farm TF-3 to MOT-101,Electrical,Tank Farm TF-3,MOT-101,2026-02-04,2026-02-20,100.0,100.0,2026-02-06,2026-02-19,321.0,321.0,m,COMPLETED
+ELE-L6-1103,1.2.4,Laying 11kV HT power cable from Scraper Station SS-01 to K-201,Electrical,Scraper Station SS-01,K-201,2026-03-04,2026-03-23,43.4,36.5,2026-03-04,,506.0,184.7,m,IN_PROGRESS
+ELE-L6-1104,1.2.4,Laying 11kV HT power cable from Metering Skid MS-02 to FIT-204,Electrical,Metering Skid MS-02,FIT-204,2026-01-28,2026-02-13,100.0,100.0,2026-01-30,2026-02-18,347.0,347.0,m,COMPLETED
+ELE-L6-1105,1.2.4,Earthing grid copper strip laying and bonding at V-105,Electrical,V-105,V-105,2026-03-24,2026-04-13,17.4,0.0,,,388.0,0.0,m,NOT_STARTED
+ELE-L6-1106,1.2.4,Earthing grid copper strip laying and bonding at V-102,Electrical,V-102,VS-04,2026-01-16,2026-02-05,100.0,100.0,2026-01-14,2026-02-07,300.0,300.0,m,COMPLETED
+ELE-L6-1107,1.2.4,Earthing grid copper strip laying and bonding at Pump House PH-1,Electrical,Pump House PH-1,TK-301,2026-02-03,2026-02-23,100.0,100.0,2026-02-06,2026-02-26,140.0,140.0,m,COMPLETED
+ELE-L6-1108,1.2.4,Earthing grid copper strip laying and bonding at Pump House PH-2,Electrical,Pump House PH-2,FIT-204,2026-03-24,2026-04-15,18.7,0.0,,,288.0,0.0,m,NOT_STARTED
+ELE-L6-1109,1.2.4,Earthing grid copper strip laying and bonding at Compressor Shed CS-A,Electrical,Compressor Shed CS-A,PIT-108,2026-02-18,2026-03-07,77.4,48.8,2026-02-18,,175.0,85.4,m,IN_PROGRESS
+ELE-L6-1110,1.2.4,Earthing grid copper strip laying and bonding at Tank Farm TF-3,Electrical,Tank Farm TF-3,SK-01,2026-03-15,2026-04-09,23.4,0.0,,,362.0,0.0,m,NOT_STARTED
+ELE-L6-1111,1.2.4,Earthing grid copper strip laying and bonding at Scraper Station SS-01,Electrical,Scraper Station SS-01,TK-301,2026-03-19,2026-04-05,19.8,0.0,,,143.0,0.0,m,NOT_STARTED
+ELE-L6-1112,1.2.4,Earthing grid copper strip laying and bonding at Metering Skid MS-02,Electrical,Metering Skid MS-02,TK-301,2026-02-27,2026-03-14,71.6,49.9,2026-02-27,,355.0,177.1,m,IN_PROGRESS
+ELE-L6-1113,1.2.4,Installation of Motor Control Center MCC panel at V-105,Electrical,V-105,V-105,2026-02-08,2026-02-17,100.0,100.0,2026-02-11,2026-02-19,3.0,3.0,panels,COMPLETED
+ELE-L6-1114,1.2.4,Installation of Motor Control Center MCC panel at V-102,Electrical,V-102,SK-01,2026-02-14,2026-03-08,72.0,54.5,2026-02-14,,7.0,3.8,panels,IN_PROGRESS
+ELE-L6-1115,1.2.4,Installation of Motor Control Center MCC panel at Pump House PH-1,Electrical,Pump House PH-1,V-105,2026-02-21,2026-03-07,71.1,50.3,2026-02-21,,5.0,2.5,panels,IN_PROGRESS
+ELE-L6-1116,1.2.4,Installation of Motor Control Center MCC panel at Pump House PH-2,Electrical,Pump House PH-2,MOT-101,2026-03-16,2026-04-09,16.9,0.0,,,6.0,0.0,panels,NOT_STARTED
+ELE-L6-1117,1.2.4,Installation of Motor Control Center MCC panel at Compressor Shed CS-A,Electrical,Compressor Shed CS-A,PIT-108,2026-02-26,2026-03-16,60.4,42.7,2026-02-26,,7.0,3.0,panels,IN_PROGRESS
+ELE-L6-1118,1.2.4,Installation of Motor Control Center MCC panel at Tank Farm TF-3,Electrical,Tank Farm TF-3,P-101B,2026-02-08,2026-02-25,100.0,100.0,2026-02-11,2026-02-28,2.0,2.0,panels,COMPLETED
+ELE-L6-1119,1.2.4,Installation of Motor Control Center MCC panel at Scraper Station SS-01,Electrical,Scraper Station SS-01,PIT-108,2026-02-08,2026-02-21,100.0,100.0,2026-02-09,2026-02-22,7.0,7.0,panels,COMPLETED
+ELE-L6-1120,1.2.4,Installation of Motor Control Center MCC panel at Metering Skid MS-02,Electrical,Metering Skid MS-02,PIT-108,2026-03-23,2026-04-18,29.6,0.0,,,4.0,0.0,panels,NOT_STARTED
+INS-L6-1121,1.2.4.1.1,Mounting and impulse tubing for transmitter P-101B,Instrumentation,V-105,P-101B,2026-02-13,2026-03-03,53.6,45.4,2026-02-13,,4.0,1.8,transmitters,IN_PROGRESS
+INS-L6-1122,1.2.4.1.1,Mounting and impulse tubing for transmitter P-101A,Instrumentation,V-102,P-101A,2026-01-20,2026-01-28,100.0,100.0,2026-01-20,2026-02-01,10.0,10.0,transmitters,COMPLETED
+INS-L6-1123,1.2.4.1.1,Mounting and impulse tubing for transmitter P-101A,Instrumentation,Pump House PH-1,P-101A,2026-01-28,2026-02-04,100.0,100.0,2026-01-28,2026-02-06,11.0,11.0,transmitters,COMPLETED
+INS-L6-1124,1.2.4.1.1,Mounting and impulse tubing for transmitter SK-01,Instrumentation,Pump House PH-2,SK-01,2026-02-27,2026-03-11,51.4,46.3,2026-02-27,,2.0,0.9,transmitters,IN_PROGRESS
+INS-L6-1125,1.2.4.1.1,Mounting and impulse tubing for transmitter V-102,Instrumentation,Compressor Shed CS-A,V-102,2026-03-07,2026-03-29,21.5,0.0,,,3.0,0.0,transmitters,NOT_STARTED
+INS-L6-1126,1.2.4.1.1,Mounting and impulse tubing for transmitter FIT-204,Instrumentation,Tank Farm TF-3,FIT-204,2026-02-03,2026-02-14,100.0,100.0,2026-02-03,2026-02-13,11.0,11.0,transmitters,COMPLETED
+INS-L6-1127,1.2.4.1.1,Mounting and impulse tubing for transmitter P-101B,Instrumentation,Scraper Station SS-01,P-101B,2026-03-27,2026-04-16,21.9,0.0,,,11.0,0.0,transmitters,NOT_STARTED
+INS-L6-1128,1.2.4.1.1,Mounting and impulse tubing for transmitter MOT-101,Instrumentation,Metering Skid MS-02,MOT-101,2026-03-22,2026-04-10,28.2,0.0,,,9.0,0.0,transmitters,NOT_STARTED
+INS-L6-1129,1.2.4.1.1,Calibration and loop check of flow sensor on V-105,Instrumentation,V-105,K-201,2026-03-10,2026-03-26,22.4,0.0,,,5.0,0.0,loops,NOT_STARTED
+INS-L6-1130,1.2.4.1.1,Calibration and loop check of flow sensor on V-102,Instrumentation,V-102,MOT-101,2026-02-10,2026-03-09,51.9,32.6,2026-02-10,,2.0,0.7,loops,IN_PROGRESS
+INS-L6-1131,1.2.4.1.1,Calibration and loop check of flow sensor on Pump House PH-1,Instrumentation,Pump House PH-1,P-101B,2026-03-26,2026-04-04,10.1,0.0,,,2.0,0.0,loops,NOT_STARTED
+INS-L6-1132,1.2.4.1.1,Calibration and loop check of flow sensor on Pump House PH-2,Instrumentation,Pump House PH-2,SK-01,2026-03-16,2026-04-01,14.6,0.0,,,1.0,0.0,loops,NOT_STARTED
+INS-L6-1133,1.2.4.1.1,Calibration and loop check of flow sensor on Compressor Shed CS-A,Instrumentation,Compressor Shed CS-A,PIT-108,2026-03-14,2026-03-23,14.7,0.0,,,6.0,0.0,loops,NOT_STARTED
+INS-L6-1134,1.2.4.1.1,Calibration and loop check of flow sensor on Tank Farm TF-3,Instrumentation,Tank Farm TF-3,K-201,2026-02-09,2026-03-01,64.5,53.3,2026-02-09,,1.0,0.5,loops,IN_PROGRESS
+INS-L6-1135,1.2.4.1.1,Calibration and loop check of flow sensor on Scraper Station SS-01,Instrumentation,Scraper Station SS-01,K-201,2026-01-24,2026-02-01,100.0,100.0,2026-01-24,2026-02-04,2.0,2.0,loops,COMPLETED
+INS-L6-1136,1.2.4.1.1,Calibration and loop check of flow sensor on Metering Skid MS-02,Instrumentation,Metering Skid MS-02,PIT-108,2026-02-20,2026-03-13,61.1,43.2,2026-02-20,,1.0,0.4,loops,IN_PROGRESS
+INS-L6-1137,1.2.4.1,Installation of ESD safety shutdown valve at V-105,Instrumentation,V-105,TK-302,2026-03-20,2026-04-13,18.8,0.0,,,4.0,0.0,valves,NOT_STARTED
+INS-L6-1138,1.2.4.1,Installation of ESD safety shutdown valve at V-102,Instrumentation,V-102,MOT-101,2026-03-11,2026-03-28,10.5,0.0,,,3.0,0.0,valves,NOT_STARTED
+INS-L6-1139,1.2.4.1,Installation of ESD safety shutdown valve at Pump House PH-1,Instrumentation,Pump House PH-1,P-101B,2026-03-31,2026-04-07,21.5,0.0,,,3.0,0.0,valves,NOT_STARTED
+INS-L6-1140,1.2.4.1,Installation of ESD safety shutdown valve at Pump House PH-2,Instrumentation,Pump House PH-2,P-101A,2026-03-22,2026-04-18,28.3,0.0,,,4.0,0.0,valves,NOT_STARTED
+INS-L6-1141,1.2.4.1,Installation of ESD safety shutdown valve at Compressor Shed CS-A,Instrumentation,Compressor Shed CS-A,P-101A,2026-03-11,2026-04-07,29.4,0.0,,,4.0,0.0,valves,NOT_STARTED
+INS-L6-1142,1.2.4.1,Installation of ESD safety shutdown valve at Tank Farm TF-3,Instrumentation,Tank Farm TF-3,SK-01,2026-03-08,2026-03-25,23.4,0.0,,,3.0,0.0,valves,NOT_STARTED
+INS-L6-1143,1.2.4.1,Installation of ESD safety shutdown valve at Scraper Station SS-01,Instrumentation,Scraper Station SS-01,P-101A,2026-03-08,2026-03-30,23.3,0.0,,,3.0,0.0,valves,NOT_STARTED
+INS-L6-1144,1.2.4.1,Installation of ESD safety shutdown valve at Metering Skid MS-02,Instrumentation,Metering Skid MS-02,TK-302,2026-01-19,2026-02-09,100.0,100.0,2026-01-19,2026-02-10,1.0,1.0,valves,COMPLETED
+HSE-L6-1145,1.1.2,Radiography safety barricading and clearing for NDT at V-105,HSE,V-105,TK-301,2026-03-07,2026-03-30,23.2,0.0,,,5.0,0.0,shifts,NOT_STARTED
+HSE-L6-1146,1.1.2,Radiography safety barricading and clearing for NDT at V-102,HSE,V-102,VS-04,2026-03-08,2026-03-16,20.4,0.0,,,11.0,0.0,shifts,NOT_STARTED
+HSE-L6-1147,1.1.2,Radiography safety barricading and clearing for NDT at Pump House PH-1,HSE,Pump House PH-1,MOT-101,2026-03-12,2026-03-20,15.3,0.0,,,11.0,0.0,shifts,NOT_STARTED
+HSE-L6-1148,1.1.2,Radiography safety barricading and clearing for NDT at Pump House PH-2,HSE,Pump House PH-2,P-101A,2026-03-12,2026-04-03,10.6,0.0,,,8.0,0.0,shifts,NOT_STARTED
+HSE-L6-1149,1.1.2,Radiography safety barricading and clearing for NDT at Compressor Shed CS-A,HSE,Compressor Shed CS-A,FIT-204,2026-02-14,2026-02-26,100.0,100.0,2026-02-16,2026-02-25,14.0,14.0,shifts,COMPLETED
+HSE-L6-1150,1.1.2,Radiography safety barricading and clearing for NDT at Tank Farm TF-3,HSE,Tank Farm TF-3,VS-04,2026-01-26,2026-02-09,100.0,100.0,2026-01-27,2026-02-08,8.0,8.0,shifts,COMPLETED
+HSE-L6-1151,1.1.2,Radiography safety barricading and clearing for NDT at Scraper Station SS-01,HSE,Scraper Station SS-01,FIT-204,2026-03-19,2026-04-04,18.3,0.0,,,13.0,0.0,shifts,NOT_STARTED
+HSE-L6-1152,1.1.2,Radiography safety barricading and clearing for NDT at Metering Skid MS-02,HSE,Metering Skid MS-02,SK-01,2026-02-15,2026-03-08,57.3,52.9,2026-02-15,,9.0,4.8,shifts,IN_PROGRESS
+HSE-L6-1153,1.2.3.1,Hydrotesting environmental containment setup at V-105,HSE,V-105,VS-04,2026-01-23,2026-02-07,100.0,100.0,2026-01-23,2026-02-12,5.0,5.0,checkpoints,COMPLETED
+HSE-L6-1154,1.2.3.1,Hydrotesting environmental containment setup at V-102,HSE,V-102,VS-04,2026-01-15,2026-01-31,100.0,100.0,2026-01-17,2026-02-03,4.0,4.0,checkpoints,COMPLETED
+HSE-L6-1155,1.2.3.1,Hydrotesting environmental containment setup at Pump House PH-1,HSE,Pump House PH-1,FIT-204,2026-02-03,2026-02-24,100.0,100.0,2026-02-04,2026-02-25,6.0,6.0,checkpoints,COMPLETED
+HSE-L6-1156,1.2.3.1,Hydrotesting environmental containment setup at Pump House PH-2,HSE,Pump House PH-2,TK-301,2026-03-25,2026-04-13,28.7,0.0,,,5.0,0.0,checkpoints,NOT_STARTED
+HSE-L6-1157,1.2.3.1,Hydrotesting environmental containment setup at Compressor Shed CS-A,HSE,Compressor Shed CS-A,P-101B,2026-03-29,2026-04-17,27.1,0.0,,,3.0,0.0,checkpoints,NOT_STARTED
+HSE-L6-1158,1.2.3.1,Hydrotesting environmental containment setup at Tank Farm TF-3,HSE,Tank Farm TF-3,TK-302,2026-02-24,2026-03-18,57.4,47.8,2026-02-24,,5.0,2.4,checkpoints,IN_PROGRESS
+HSE-L6-1159,1.2.3.1,Hydrotesting environmental containment setup at Scraper Station SS-01,HSE,Scraper Station SS-01,FIT-204,2026-03-19,2026-03-27,20.0,0.0,,,3.0,0.0,checkpoints,NOT_STARTED
+HSE-L6-1160,1.2.3.1,Hydrotesting environmental containment setup at Metering Skid MS-02,HSE,Metering Skid MS-02,MOT-101,2026-01-27,2026-02-17,100.0,100.0,2026-01-29,2026-02-19,2.0,2.0,checkpoints,COMPLETED
