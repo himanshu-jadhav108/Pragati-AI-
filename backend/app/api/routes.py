@@ -163,50 +163,84 @@ def get_events(document_id: Optional[str] = None, db: Session = Depends(get_db))
         query = query.filter(FieldEvent.document_id == document_id)
     return query.order_by(FieldEvent.created_at.desc()).all()
 
-# 7. Matches for a specific Event
+# 7. Matches for a specific Event (Read-Only)
 @router.get("/matches/{event_id}", response_model=EventMatchesResponse)
 def get_matches_for_event(event_id: str, db: Session = Depends(get_db)):
+    """
+    Read-only retrieval of candidate matches for a given field event.
+    Does not delete or recreate matches on repeated GET requests.
+    """
     event = db.query(FieldEvent).filter(FieldEvent.id == event_id).first()
     if not event:
         raise HTTPException(status_code=404, detail="Field event not found")
         
     engine = MatchingEngine(db, project_id=event.document.project_id if event.document else "OIL-DNPE-2026")
+    stored = engine.get_stored_matches(event)
+    if stored:
+        return stored
+    # If no matches exist yet, compute and persist them once
     return engine.process_and_persist_matches(event)
 
-# 8. Review Queue (All pending matches)
+@router.post("/matches/{event_id}/recompute", response_model=EventMatchesResponse)
+def recompute_matches_for_event(event_id: str, db: Session = Depends(get_db)):
+    """
+    Explicit operation to re-evaluate and persist matches for an event.
+    """
+    event = db.query(FieldEvent).filter(FieldEvent.id == event_id).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Field event not found")
+    engine = MatchingEngine(db, project_id=event.document.project_id if event.document else "OIL-DNPE-2026")
+    return engine.process_and_persist_matches(event)
+
+# 8. Review Queue (Unresolved pending items by default)
 @router.get("/review-queue")
 def get_review_queue(
     confidence: Optional[str] = None,
     discipline: Optional[str] = None,
+    status: str = "pending",
     db: Session = Depends(get_db)
 ):
-    query = (
-        db.query(Match)
-        .filter(Match.rank == 1)
-        .order_by(Match.created_at.desc())
-    )
+    """
+    Human-in-the-loop review queue.
+    Default filters to pending items (PENDING, UNMATCHED).
+    Committed/resolved items (APPROVED, EDITED_APPROVED, REJECTED) are excluded from pending view.
+    """
+    query = db.query(Match).filter(Match.rank == 1)
+
+    if status == "pending":
+        query = query.filter(Match.decision.in_(["PENDING", "UNMATCHED"]))
+    elif status == "resolved":
+        query = query.filter(Match.decision.in_(["APPROVED", "EDITED_APPROVED", "EDITED", "REJECTED"]))
+
     if confidence:
         query = query.filter(Match.confidence_tier == confidence)
         
-    matches = query.all()
+    matches = query.order_by(Match.created_at.desc()).all()
     results = []
     for m in matches:
         evt = m.event
+        if not evt:
+            continue
         if discipline and evt.discipline != discipline:
             continue
+
+        # Extract structured why_matched list from rationale
+        why_list = [s.strip() for s in (m.rationale or "").split(";") if s.strip()]
+
         results.append({
             "match_id": m.id,
             "event_id": evt.id,
-            "document_filename": evt.document.filename if evt.document else "Direct Entry",
+            "document_filename": evt.document.filename if evt.document else "Time Agent / Direct",
             "raw_text": evt.raw_text,
-            "evidence_text": evt.evidence_text,
+            "evidence_text": evt.evidence_text or evt.raw_text,
             "activity_id": m.activity_id,
-            "activity_description": m.candidate_activity.description if m.candidate_activity else "No matching activity",
+            "activity_description": m.candidate_activity.description if m.candidate_activity else "No matching schedule activity",
             "discipline": evt.discipline or (m.candidate_activity.discipline if m.candidate_activity else "Unknown"),
             "location": evt.location or (m.candidate_activity.location if m.candidate_activity else "-"),
             "final_score": m.final_score,
             "confidence_tier": m.confidence_tier,
             "decision": m.decision,
+            "why_matched": why_list,
             "scores": {
                 "semantic": m.score_semantic,
                 "discipline": m.score_discipline,
@@ -305,7 +339,7 @@ def quick_log_event(req: QuickLogRequest, db: Session = Depends(get_db)):
     # 1. Create Document record
     doc = Document(
         project_id=project_id,
-        filename=f"QuickLog_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.txt",
+        filename=f"QuickLog_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
         file_type="quick_log",
         file_size=len(req.text.strip().encode("utf-8")),
         raw_text=req.text.strip(),
@@ -333,10 +367,11 @@ def quick_log_event(req: QuickLogRequest, db: Session = Depends(get_db)):
     saved_event = None
 
     for item in extracted_items:
+        effective_evt_date = item.event_date or settings.get_effective_date()
         evt = FieldEvent(
             document_id=doc.id,
             raw_text=item.evidence_text or item.activity_description or req.text.strip(),
-            event_date=item.event_date or datetime.utcnow().strftime("%Y-%m-%d"),
+            event_date=effective_evt_date,
             discipline=item.discipline,
             activity_description=item.activity_description or req.text.strip()[:200],
             location=item.location,
@@ -360,13 +395,14 @@ def quick_log_event(req: QuickLogRequest, db: Session = Depends(get_db)):
     top_cand = last_match_resp.top_candidates[0] if (last_match_resp and last_match_resp.top_candidates) else None
     conf_tier = last_match_resp.confidence_tier if last_match_resp else "UNMATCHED"
     score = top_cand.scores.final_score if top_cand else 0.0
+    why_matched = top_cand.why_matched if top_cand else []
 
     is_valid_match = (conf_tier in ["HIGH", "MEDIUM"] and score >= settings.THRESHOLD_UNMATCHED)
 
     if is_valid_match and top_cand:
         matched_id = top_cand.activity_id
         matched_desc = top_cand.description
-        confirmation = f"Logged: {saved_event.activity_description} - matched to {matched_id} ({conf_tier} confidence)."
+        confirmation = f"Logged: {saved_event.activity_description} — matched to {matched_id} ({conf_tier} CONFIDENCE, score {score:.3f})."
     else:
         matched_id = None
         matched_desc = None
@@ -387,13 +423,17 @@ def quick_log_event(req: QuickLogRequest, db: Session = Depends(get_db)):
             "progress_percent": saved_event.progress_percent if saved_event else 0.0,
             "quantity": saved_event.quantity if saved_event else None,
             "unit": saved_event.unit if saved_event else None,
-            "activity_description": saved_event.activity_description if saved_event else req.text.strip()
+            "activity_description": saved_event.activity_description if saved_event else req.text.strip(),
+            "event_date": saved_event.event_date if saved_event else settings.get_effective_date(),
+            "source_evidence": saved_event.evidence_text if saved_event else req.text.strip()
         },
         "matched_activity_id": matched_id,
         "matched_activity_description": matched_desc,
         "confidence_tier": conf_tier,
+        "match_score": round(score, 3),
         "score": round(score, 3),
         "top_score": round(score, 3),
+        "why_matched": why_matched,
         "confirmation_message": confirmation,
         "message": confirmation,
         "needs_detail": not is_valid_match
@@ -403,17 +443,19 @@ def quick_log_event(req: QuickLogRequest, db: Session = Depends(get_db)):
 @router.get("/insights/history")
 def get_historical_insights(
     discipline: Optional[str] = None,
+    q: Optional[str] = None,
     project_id: str = "OIL-DNPE-2026",
     db: Session = Depends(get_db)
 ):
     """
-    Surfaces historical execution patterns from already-approved data:
+    Surfaces historical execution patterns and execution memory from verified audit records:
     1. Planned vs actual duration in days
     2. Variance in days
-    3. Group and aggregate by discipline (overruns vs on-time/early)
-    4. Project-level summary sorted by discipline with most overrun days first
+    3. Source evidence traceability and approver
+    4. Keyword search across execution memory
     """
     from backend.app.services.analytics.history_service import HistoryService
     service = HistoryService(db, project_id=project_id)
-    return service.get_historical_insights(discipline=discipline)
+    return service.get_historical_insights(discipline=discipline, q=q)
+
 

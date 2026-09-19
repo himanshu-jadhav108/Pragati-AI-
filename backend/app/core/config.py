@@ -42,6 +42,21 @@ class Settings:
 
 
     
+    # Deterministic Demo Mode (SIH26122 Selection Round)
+    DEMO_MODE: bool = os.getenv("DEMO_MODE", "true").strip().lower() in ("true", "1", "yes")
+    DEMO_DATE: str = os.getenv("DEMO_DATE", "2026-03-08").strip()
+
+    @classmethod
+    def get_effective_date(cls) -> str:
+        """
+        Returns deterministic demo date when DEMO_MODE is enabled,
+        otherwise falls back to current UTC date.
+        """
+        if cls.DEMO_MODE:
+            return cls.DEMO_DATE
+        from datetime import datetime
+        return datetime.now().strftime("%Y-%m-%d")
+
     # Matching Engine Weights
     WEIGHT_SEMANTIC: float = float(os.getenv("WEIGHT_SEMANTIC", "0.50"))
     WEIGHT_DISCIPLINE: float = float(os.getenv("WEIGHT_DISCIPLINE", "0.15"))
@@ -49,10 +64,11 @@ class Settings:
     WEIGHT_LOCATION: float = float(os.getenv("WEIGHT_LOCATION", "0.10"))
     WEIGHT_TEMPORAL: float = float(os.getenv("WEIGHT_TEMPORAL", "0.10"))
     
-    # Confidence Routing Thresholds
+    # Confidence Routing Thresholds (Prototype Selection Round)
     THRESHOLD_HIGH: float = float(os.getenv("THRESHOLD_HIGH", "0.70"))
     THRESHOLD_MEDIUM: float = float(os.getenv("THRESHOLD_MEDIUM", "0.48"))
-    THRESHOLD_UNMATCHED: float = float(os.getenv("THRESHOLD_UNMATCHED", "0.32"))
+    THRESHOLD_UNMATCHED: float = float(os.getenv("THRESHOLD_UNMATCHED", "0.35"))
     MARGIN_HIGH_CONFIDENCE: float = float(os.getenv("MARGIN_HIGH_CONFIDENCE", "0.08"))
 
 settings = Settings()
+

@@ -118,12 +118,14 @@ class MatchCandidate(BaseModel):
     confidence_tier: str
     rationale: str
     contradictions: Optional[str] = None
+    why_matched: Optional[List[str]] = None
 
 class EventMatchesResponse(BaseModel):
     event: FieldEventResponse
     source_document: Optional[DocumentResponse] = None
     top_candidates: List[MatchCandidate]
     confidence_tier: str
+    match_score: Optional[float] = None
     recommended_activity_id: Optional[str] = None
     decision: str = "PENDING"
     match_id: Optional[str] = None

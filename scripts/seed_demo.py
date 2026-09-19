@@ -110,7 +110,7 @@ def run_seed(db: Session = None):
         previous_state={"activity_id": "CIV-L6-0112", "actual_progress": 60.0, "status": "IN_PROGRESS"},
         resulting_state={"activity_id": "CIV-L6-0112", "actual_progress": 100.0, "status": "COMPLETED"},
         actor="Chief Planner",
-        timestamp=datetime.utcnow() - timedelta(days=5),
+        timestamp=datetime.now() - timedelta(days=5),
         notes="Approved completed foundation pour for Booster Pump P-101A"
     )
     db.add(audit_seed_1)
@@ -127,7 +127,7 @@ def run_seed(db: Session = None):
         previous_state={"activity_id": "CIV-L6-0113", "actual_progress": 70.0, "status": "IN_PROGRESS"},
         resulting_state={"activity_id": "CIV-L6-0113", "actual_progress": 100.0, "status": "COMPLETED"},
         actor="Chief Planner",
-        timestamp=datetime.utcnow() - timedelta(days=4),
+        timestamp=datetime.now() - timedelta(days=4),
         notes="Approved completed foundation pour for Booster Pump P-101B"
     )
     db.add(audit_seed_2)

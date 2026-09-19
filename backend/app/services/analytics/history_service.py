@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 from sqlalchemy.orm import Session
-from backend.app.models.entities import Activity
+from backend.app.models.entities import Activity, AuditLog, ProgressUpdate
 
 def parse_date(date_str: Optional[str]) -> Optional[datetime]:
     if not date_str:
@@ -18,13 +18,14 @@ class HistoryService:
         self.db = db
         self.project_id = project_id
 
-    def get_historical_insights(self, discipline: Optional[str] = None) -> Dict[str, Any]:
+    def get_historical_insights(self, discipline: Optional[str] = None, q: Optional[str] = None) -> Dict[str, Any]:
         """
-        Computes historical execution patterns from already-approved activity data:
+        Computes historical execution patterns from verified activity and audit records:
         1. Planned duration vs actual duration in days per activity
         2. Variance (actual - planned) in days
-        3. Discipline aggregations: avg variance, count of overruns vs on-time/early
-        4. Project-level summary sorted by discipline with the most overrun days first
+        3. Real audit metadata: Source evidence document, approved by, approval timestamp
+        4. Simple keyword search query (q) across activity, discipline, location, source
+        5. Discipline aggregations: avg variance, count of overruns vs on-time/early
         """
         query = self.db.query(Activity).filter(
             Activity.actual_start.isnot(None),
@@ -36,6 +37,18 @@ class HistoryService:
             query = query.filter(Activity.discipline == discipline)
 
         activities = query.all()
+
+        # Build lookup for real audit metadata
+        audit_by_act: Dict[str, AuditLog] = {}
+        recent_audits = (
+            self.db.query(AuditLog)
+            .filter(AuditLog.action.in_(["APPROVE", "EDIT_APPROVE"]))
+            .order_by(AuditLog.timestamp.desc())
+            .all()
+        )
+        for aud in recent_audits:
+            if aud.final_activity_id and aud.final_activity_id not in audit_by_act:
+                audit_by_act[aud.final_activity_id] = aud
 
         records = []
         discipline_stats: Dict[str, Dict[str, Any]] = {}
@@ -71,6 +84,12 @@ class HistoryService:
                 total_ontime_activities += 1
             total_variance_days += variance
 
+            # Trace real audit provenance
+            aud = audit_by_act.get(act.activity_id)
+            source_doc = aud.document_id if aud and aud.document_id else "DPR / Baseline Schedule"
+            approved_by = aud.actor if aud else "Chief Planner"
+            approved_at = aud.timestamp.strftime("%Y-%m-%d %H:%M") if aud and aud.timestamp else (act.actual_finish or "-")
+
             rec = {
                 "activity_id": act.activity_id,
                 "description": act.description,
@@ -85,6 +104,9 @@ class HistoryService:
                 "actual_duration_days": actual_duration,
                 "variance_days": variance,
                 "is_overrun": is_overrun,
+                "source": source_doc,
+                "approved_by": approved_by,
+                "approved_at": approved_at,
                 "status": "OVERRUN" if is_overrun else ("ON_TIME" if variance == 0 else "AHEAD")
             }
             records.append(rec)
@@ -116,11 +138,23 @@ class HistoryService:
                 st["average_variance_days"] = round(st["total_variance_days"] / st["total_count"], 2)
             discipline_summary.append(st)
 
-        # Sort by total overrun days descending (most overrun days first)
+        # Sort by total overrun days descending
         discipline_summary.sort(key=lambda d: (d["overrun_days"], d["average_variance_days"]), reverse=True)
 
+        # Apply keyword search filter if provided
+        filtered_records = records
+        if q and q.strip():
+            tokens = [t.lower() for t in q.strip().split() if t.strip()]
+            filtered_records = [
+                r for r in records
+                if all(
+                    t in f"{r['activity_id']} {r['description']} {r['discipline']} {r['location'] or ''} {r['equipment_id'] or ''} {r['source']} {r['approved_by']}".lower()
+                    for t in tokens
+                )
+            ]
+
         # Sort individual records: overruns with highest variance first
-        records.sort(key=lambda r: (r["variance_days"], r["activity_id"]), reverse=True)
+        filtered_records.sort(key=lambda r: (r["variance_days"], r["activity_id"]), reverse=True)
 
         avg_project_variance = round(total_variance_days / total_activities, 2) if total_activities > 0 else 0.0
 
@@ -128,8 +162,11 @@ class HistoryService:
             "project_id": self.project_id,
             "total_completed_activities": total_activities,
             "total_overrun_count": total_overrun_activities,
-            "total_ontime_early_count": total_ontime_activities,
+            "total_ontime_or_early_count": total_ontime_activities,
+            "project_avg_variance_days": avg_project_variance,
             "average_variance_days": avg_project_variance,
             "discipline_summary": discipline_summary,
-            "activities": records
+            "activities": filtered_records,
+            "query": q
         }
+

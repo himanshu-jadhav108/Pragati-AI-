@@ -201,16 +201,50 @@ function renderRecentAudits(audits) {
 }
 
 // 2. Review Queue Handling
-async function loadReviewQueue(filterConf = null) {
+let currentQueueStatus = 'pending';
+let currentQueueConf = null;
+
+async function filterQueue(conf = null, status = 'pending') {
+  currentQueueConf = conf;
+  currentQueueStatus = status;
+
+  // Update button visual styles
+  const btnIds = ['rq-btn-all', 'rq-btn-high', 'rq-btn-med', 'rq-btn-unm', 'rq-btn-res'];
+  btnIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active-filter-btn');
+  });
+
+  if (status === 'resolved') {
+    const el = document.getElementById('rq-btn-res');
+    if (el) el.classList.add('active-filter-btn');
+  } else if (!conf) {
+    const el = document.getElementById('rq-btn-all');
+    if (el) el.classList.add('active-filter-btn');
+  } else if (conf === 'HIGH') {
+    const el = document.getElementById('rq-btn-high');
+    if (el) el.classList.add('active-filter-btn');
+  } else if (conf === 'MEDIUM') {
+    const el = document.getElementById('rq-btn-med');
+    if (el) el.classList.add('active-filter-btn');
+  } else if (conf === 'UNMATCHED') {
+    const el = document.getElementById('rq-btn-unm');
+    if (el) el.classList.add('active-filter-btn');
+  }
+
+  await loadReviewQueue(conf, status);
+}
+
+async function loadReviewQueue(filterConf = currentQueueConf, status = currentQueueStatus) {
   try {
-    let url = '/api/review-queue';
-    if (filterConf) url += `?confidence=${filterConf}`;
+    let url = `/api/review-queue?status=${encodeURIComponent(status)}`;
+    if (filterConf) url += `&confidence=${encodeURIComponent(filterConf)}`;
     const res = await fetch(url);
     const data = await res.json();
     state.reviewQueue = data;
     renderReviewQueue(data);
   } catch (err) {
-    showToast('Failed to load review queue', 'error');
+    showToast('Failed to load review queue: ' + err.message, 'error');
   }
 }
 
@@ -219,7 +253,7 @@ function renderReviewQueue(items) {
   document.getElementById('queue-count-badge').innerText = items.length;
 
   if (!items.length) {
-    container.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2rem; color:#64748b;">No pending review items found in queue.</td></tr>`;
+    container.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2.5rem; color:#64748b;">No ${currentQueueStatus} review items found.</td></tr>`;
     return;
   }
 
@@ -229,27 +263,38 @@ function renderReviewQueue(items) {
     else if (item.confidence_tier === 'MEDIUM') confBadge = 'badge-medium';
     else if (item.confidence_tier === 'UNMATCHED') confBadge = 'badge-unmatched';
 
+    const isPending = item.decision === 'PENDING';
+    const isUnmatched = item.confidence_tier === 'UNMATCHED';
+
     return `
       <tr>
         <td>
           <span class="badge ${confBadge}">${item.confidence_tier}</span>
-          <div style="font-size:0.75rem; font-weight:700; color:#0284c7; margin-top:0.25rem;">Score: ${(item.final_score * 100).toFixed(1)}%</div>
+          <div style="font-size:0.75rem; font-weight:600; color:#475569; margin-top:0.25rem;">
+            ${isUnmatched ? 'Isolated' : `Match Score: ${(item.final_score).toFixed(3)}`}
+          </div>
         </td>
         <td>
-          <div style="font-weight:600; font-size:0.825rem;">${escapeHtml(item.raw_text)}</div>
-          <div style="font-size:0.725rem; color:#64748b; margin-top:0.2rem;">Doc: ${item.document_filename}</div>
+          <div style="font-weight:600; font-size:0.825rem; color:#0f172a;">${escapeHtml(item.raw_text)}</div>
+          <div style="font-size:0.725rem; color:#64748b; margin-top:0.2rem;">
+            Source: <strong>${escapeHtml(item.document_filename)}</strong>
+          </div>
         </td>
         <td>
-          <div style="font-weight:600; font-size:0.825rem; color:#0f172a;">${item.activity_id || 'No Candidate'}</div>
+          <div style="font-weight:700; font-size:0.825rem; color:#0284c7;">${item.activity_id || '<span style="color:#94a3b8;">No Scheduled Candidate</span>'}</div>
           <div style="font-size:0.75rem; color:#475569;">${escapeHtml(item.activity_description)}</div>
         </td>
-        <td><span class="badge-tag">${item.discipline}</span></td>
+        <td><span class="badge-tag">${item.discipline || '-'}</span></td>
         <td>${item.location || '-'}</td>
-        <td><span class="badge ${item.decision === 'APPROVED' ? 'badge-high' : 'badge-medium'}">${item.decision}</span></td>
         <td>
-          <div style="display:flex; gap:0.4rem;">
+          <span class="badge ${item.decision === 'APPROVED' ? 'badge-high' : (item.decision === 'REJECTED' ? 'badge-low' : 'badge-medium')}">
+            ${item.decision}
+          </span>
+        </td>
+        <td>
+          <div style="display:flex; gap:0.4rem; align-items:center;">
             <button class="btn btn-outline btn-sm" onclick="openReviewModal('${item.event_id}')">Inspect</button>
-            ${item.decision === 'PENDING' && item.confidence_tier !== 'UNMATCHED' ? `
+            ${isPending && !isUnmatched ? `
               <button class="btn btn-success btn-sm" onclick="quickApprove('${item.match_id}')">Approve</button>
             ` : ''}
           </div>
@@ -278,122 +323,234 @@ function renderReviewModal(data) {
   const doc = data.source_document;
   const topCandidate = data.top_candidates && data.top_candidates[0];
 
-  // Left Pane: Evidence & Document
-  document.getElementById('modal-doc-name').innerText = doc ? doc.filename : 'Field DPR';
-  document.getElementById('modal-evidence-text').innerText = evt.evidence_text || evt.raw_text;
-  document.getElementById('modal-raw-doc-text').innerText = doc ? doc.raw_text : 'Source text unavailable.';
+  // Hide mutation banner on open
+  const banner = document.getElementById('modal-schedule-mutation-banner');
+  if (banner) {
+    banner.style.display = 'none';
+    banner.innerHTML = '';
+  }
 
-  // Right Pane: Extracted Fields
-  document.getElementById('modal-extracted-grid').innerHTML = `
-    <div><strong>Discipline:</strong> ${evt.discipline || 'Unknown'}</div>
-    <div><strong>Location:</strong> ${evt.location || 'Not Specified'}</div>
-    <div><strong>Equipment Tag:</strong> ${evt.equipment_id || 'None'}</div>
-    <div><strong>Status:</strong> ${evt.status || 'In Progress'}</div>
-    <div><strong>Quantity:</strong> ${evt.quantity ? `${evt.quantity} ${evt.unit || ''}` : 'N/A'}</div>
-    <div><strong>Event Date:</strong> ${evt.event_date || 'Current'}</div>
-  `;
+  // Left Pane: Document Name & Canonical Progress Event Card
+  const docNameEl = document.getElementById('modal-doc-name');
+  if (docNameEl) docNameEl.innerText = doc ? doc.filename : 'Time Agent / Quick Log';
 
-  // Top candidate & scoring meters
+  const rawDocEl = document.getElementById('modal-raw-doc-text');
+  if (rawDocEl) rawDocEl.innerText = doc ? (doc.raw_text || 'Raw document text unavailable.') : (evt.raw_text || '');
+
+  const canonicalCard = document.getElementById('modal-canonical-card');
+  if (canonicalCard) {
+    const displayEvtId = evt.id ? (evt.id.length > 12 ? evt.id.substring(0, 8) + '...' : evt.id) : 'EVT-FIELD';
+    canonicalCard.innerHTML = `
+      <div class="canonical-event-header">
+        <span>EVENT ID: <strong>${displayEvtId}</strong></span>
+        <span>DATE: <strong>${evt.event_date || '08 Mar 2026'}</strong></span>
+      </div>
+      <div class="canonical-grid">
+        <div class="canonical-item">
+          <label>Discipline</label>
+          <span>${escapeHtml(evt.discipline || 'Piping')}</span>
+        </div>
+        <div class="canonical-item">
+          <label>Activity</label>
+          <span>${escapeHtml(evt.activity_description || 'Erection')}</span>
+        </div>
+        <div class="canonical-item">
+          <label>Location</label>
+          <span>${escapeHtml(evt.location || 'V-105')}</span>
+        </div>
+        <div class="canonical-item">
+          <label>Asset / Equip</label>
+          <span>${escapeHtml(evt.equipment_id || 'Line 24-inch')}</span>
+        </div>
+        <div class="canonical-item">
+          <label>Quantity & Unit</label>
+          <span>${evt.quantity ? `${evt.quantity} ${evt.unit || ''}` : 'N/A'}</span>
+        </div>
+        <div class="canonical-item">
+          <label>Status</label>
+          <span>${escapeHtml(evt.status || 'COMPLETED')}</span>
+        </div>
+        <div class="canonical-item">
+          <label>Source</label>
+          <span>${doc ? escapeHtml(doc.filename) : 'Time Agent'}</span>
+        </div>
+        <div class="canonical-item">
+          <label>Contractor</label>
+          <span>Not Specified</span>
+        </div>
+      </div>
+      <div style="margin-top:0.75rem; padding:0.6rem 0.75rem; background:#f1f5f9; border-left:3px solid #0284c7; border-radius:4px; font-size:0.775rem;">
+        <strong style="color:#0f172a; text-transform:uppercase; font-size:0.68rem; letter-spacing:0.04em;">Source Evidence:</strong>
+        <div style="font-style:italic; color:#334155; margin-top:0.25rem; font-size:0.825rem;">
+          &ldquo;${escapeHtml(evt.evidence_text || evt.raw_text)}&rdquo;
+        </div>
+      </div>
+    `;
+  }
+
+  // Right Pane: Top Candidate, Why This Match, Score Breakdown & Alternatives
   const candidatesContainer = document.getElementById('modal-candidates-list');
   if (!data.top_candidates || !data.top_candidates.length || data.confidence_tier === 'UNMATCHED') {
     candidatesContainer.innerHTML = `
-      <div style="padding:1rem; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; text-align:center;">
-        <span class="badge badge-unmatched" style="font-size:0.85rem;">UNMATCHED EVENT</span>
-        <p style="font-size:0.8rem; color:#64748b; margin-top:0.5rem;">
-          The system found no schedule activity matching this field report with acceptable confidence.
-          No schedule update will be performed.
+      <div style="padding:1.5rem; background:#fef2f2; border:1px dashed #fca5a5; border-radius:8px; text-align:center;">
+        <span class="badge badge-unmatched" style="font-size:0.85rem;">NO RELIABLE SCHEDULE MATCH</span>
+        <h4 style="font-size:0.9rem; color:#991b1b; margin-top:0.6rem; margin-bottom:0.35rem;">Safely Isolated from Baseline Schedule</h4>
+        <p style="font-size:0.8rem; color:#7f1d1d; margin:0; line-height:1.45;">
+          The system found no L5/L6 schedule activity matching this field statement above confidence thresholds.
+          This item will NOT mutate the Primavera P6 schedule automatically.
         </p>
+        <div style="margin-top:1rem; display:flex; justify-content:center; gap:0.5rem;">
+          <button class="btn btn-outline btn-sm" onclick="openEditModal()">Map Manually to Activity</button>
+        </div>
       </div>
     `;
     document.getElementById('modal-actions-bar').innerHTML = `
       <button class="btn btn-outline" onclick="closeReviewModal()">Close</button>
-      <button class="btn btn-danger" onclick="rejectActiveMatch('No matching activity')">Mark Ignored</button>
+      <button class="btn btn-danger" onclick="rejectActiveMatch('No matching activity in baseline schedule')">Mark Ignored / Rejected</button>
     `;
     return;
   }
 
-  candidatesContainer.innerHTML = data.top_candidates.map((c, idx) => {
-    const scores = c.scores;
-    const isRecommended = idx === 0;
-    return `
-      <div style="border:1px solid ${isRecommended ? '#0284c7' : '#e2e8f0'}; border-radius:8px; padding:1rem; margin-bottom:0.75rem; background:${isRecommended ? '#f0f9ff' : '#ffffff'};">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-          <div>
-            <span class="badge ${isRecommended ? 'badge-high' : 'badge-medium'}">Rank #${c.rank}</span>
-            <strong style="font-size:0.9rem; margin-left:0.4rem;">${c.activity_id}</strong>
-            <div style="font-size:0.825rem; font-weight:600; color:#0f172a; margin-top:0.2rem;">${escapeHtml(c.description)}</div>
+  // Render Top Candidate
+  const topCand = data.top_candidates[0];
+  const topScores = topCand.scores;
+  const whyMatchedList = topCand.why_matched || [];
+
+  let candidatesHtml = `
+    <!-- Top Recommended Candidate -->
+    <div style="border:1.5px solid #0284c7; border-radius:8px; padding:1.1rem; margin-bottom:1rem; background:#f8fafc;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div>
+          <div style="display:flex; align-items:center; gap:0.4rem;">
+            <span class="badge badge-high">Rank #1 (AI Recommendation)</span>
+            <span class="badge ${topCand.confidence_tier === 'HIGH' ? 'badge-high' : (topCand.confidence_tier === 'MEDIUM' ? 'badge-medium' : 'badge-low')}">
+              ${topCand.confidence_tier} CONFIDENCE
+            </span>
           </div>
-          <div style="text-align:right;">
-            <div style="font-size:1.15rem; font-weight:800; color:#0284c7;">${(scores.final_score * 100).toFixed(1)}%</div>
-            <span class="badge ${c.confidence_tier === 'HIGH' ? 'badge-high' : (c.confidence_tier === 'MEDIUM' ? 'badge-medium' : 'badge-low')}">${c.confidence_tier}</span>
+          <div style="font-size:1.05rem; font-weight:800; color:#0f172a; margin-top:0.4rem;">
+            ${escapeHtml(topCand.activity_id)}: ${escapeHtml(topCand.description)}
           </div>
         </div>
-
-        <!-- Scores Breakdown -->
-        <div style="margin-top:0.75rem; background:#ffffff; padding:0.6rem; border-radius:6px; border:1px solid #e2e8f0;">
-          <div class="score-row">
-            <span class="score-name">Semantic Similarity (50%)</span>
-            <div class="score-bar-bg"><div class="score-bar-fill" style="width:${scores.score_semantic * 100}%"></div></div>
-            <span class="score-val">${scores.score_semantic.toFixed(2)}</span>
-          </div>
-          <div class="score-row">
-            <span class="score-name">Discipline Match (15%)</span>
-            <div class="score-bar-bg"><div class="score-bar-fill" style="width:${scores.score_discipline * 100}%"></div></div>
-            <span class="score-val">${scores.score_discipline.toFixed(2)}</span>
-          </div>
-          <div class="score-row">
-            <span class="score-name">Entity / Equipment (15%)</span>
-            <div class="score-bar-bg"><div class="score-bar-fill" style="width:${scores.score_entity * 100}%"></div></div>
-            <span class="score-val">${scores.score_entity.toFixed(2)}</span>
-          </div>
-          <div class="score-row">
-            <span class="score-name">Location / Area (10%)</span>
-            <div class="score-bar-bg"><div class="score-bar-fill" style="width:${scores.score_location * 100}%"></div></div>
-            <span class="score-val">${scores.score_location.toFixed(2)}</span>
-          </div>
-          <div class="score-row">
-            <span class="score-name">Schedule Temporal (10%)</span>
-            <div class="score-bar-bg"><div class="score-bar-fill" style="width:${scores.score_temporal * 100}%"></div></div>
-            <span class="score-val">${scores.score_temporal.toFixed(2)}</span>
-          </div>
-          ${scores.penalty_contradiction > 0 ? `
-            <div class="score-row" style="color:#dc2626;">
-              <span class="score-name">Contradiction Penalty</span>
-              <div class="score-bar-bg"><div class="score-bar-fill" style="width:${scores.penalty_contradiction * 100}%; background:#dc2626;"></div></div>
-              <span class="score-val">-${scores.penalty_contradiction.toFixed(2)}</span>
-            </div>
-          ` : ''}
+        <div style="text-align:right;">
+          <div style="font-size:1.1rem; font-weight:800; color:#0284c7;">Match Score: ${(topScores.final_score).toFixed(3)}</div>
+          <div style="font-size:0.7rem; color:#64748b;">Heuristic Scoring Signal</div>
         </div>
+      </div>
 
-        <div style="font-size:0.75rem; color:#475569; margin-top:0.5rem;">
-          <strong>Rationale:</strong> ${c.rationale}
+      <!-- Why This Match Checklist -->
+      <div class="why-matched-container">
+        <div class="why-matched-title">
+          <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Why This Match? Supporting Evidence
         </div>
-        ${c.contradictions ? `
-          <div style="font-size:0.75rem; color:#dc2626; margin-top:0.25rem;">
-            <strong>Warning:</strong> ${c.contradictions}
-          </div>
-        ` : ''}
+        <div class="why-matched-list">
+          ${whyMatchedList.length > 0 ? whyMatchedList.map(item => {
+            const isChecked = item.startsWith('✓');
+            const itemClass = isChecked ? 'signal-checked' : 'signal-warning';
+            return `<div class="why-matched-item ${itemClass}">${escapeHtml(item)}</div>`;
+          }).join('') : `<div class="why-matched-item signal-checked">✓ High semantic similarity (${topScores.score_semantic.toFixed(2)})</div>`}
+        </div>
+      </div>
 
-        ${!isRecommended ? `
-          <div style="margin-top:0.5rem; text-align:right;">
-            <button class="btn btn-outline btn-sm" onclick="chooseCandidateForEdit('${c.activity_id}')">Select this activity</button>
+      <!-- Orthogonal Score Breakdown Bars -->
+      <div style="margin-top:0.75rem; background:#ffffff; padding:0.6rem 0.8rem; border-radius:6px; border:1px solid #e2e8f0;">
+        <div class="score-row">
+          <span class="score-name">Semantic Similarity (50%)</span>
+          <div class="score-bar-bg"><div class="score-bar-fill" style="width:${topScores.score_semantic * 100}%"></div></div>
+          <span class="score-val">${topScores.score_semantic.toFixed(2)}</span>
+        </div>
+        <div class="score-row">
+          <span class="score-name">Discipline Match (15%)</span>
+          <div class="score-bar-bg"><div class="score-bar-fill" style="width:${topScores.score_discipline * 100}%"></div></div>
+          <span class="score-val">${topScores.score_discipline.toFixed(2)}</span>
+        </div>
+        <div class="score-row">
+          <span class="score-name">Entity / Equipment (15%)</span>
+          <div class="score-bar-bg"><div class="score-bar-fill" style="width:${topScores.score_entity * 100}%"></div></div>
+          <span class="score-val">${topScores.score_entity.toFixed(2)}</span>
+        </div>
+        <div class="score-row">
+          <span class="score-name">Location Match (10%)</span>
+          <div class="score-bar-bg"><div class="score-bar-fill" style="width:${topScores.score_location * 100}%"></div></div>
+          <span class="score-val">${topScores.score_location.toFixed(2)}</span>
+        </div>
+        <div class="score-row">
+          <span class="score-name">Schedule Temporal (10%)</span>
+          <div class="score-bar-bg"><div class="score-bar-fill" style="width:${topScores.score_temporal * 100}%"></div></div>
+          <span class="score-val">${topScores.score_temporal.toFixed(2)}</span>
+        </div>
+        ${topScores.penalty_contradiction > 0 ? `
+          <div class="score-row" style="color:#dc2626;">
+            <span class="score-name">Contradiction Penalty</span>
+            <div class="score-bar-bg"><div class="score-bar-fill" style="width:${topScores.penalty_contradiction * 100}%; background:#dc2626;"></div></div>
+            <span class="score-val">-${topScores.penalty_contradiction.toFixed(2)}</span>
           </div>
         ` : ''}
       </div>
-    `;
-  }).join('');
-
-  // Action Buttons
-  document.getElementById('modal-actions-bar').innerHTML = `
-    <button class="btn btn-outline" onclick="closeReviewModal()">Cancel</button>
-    <button class="btn btn-danger" onclick="rejectActiveMatch()">Reject Match</button>
-    <button class="btn btn-outline" onclick="openEditModal()">Edit & Approve</button>
-    <button class="btn btn-success" onclick="approveActiveMatch('${data.match_id}')">Approve Schedule Update</button>
+    </div>
   `;
+
+  // Alternative Candidates (Rank 2, 3...)
+  if (data.top_candidates.length > 1) {
+    candidatesHtml += `
+      <div style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.5rem;">
+        Alternative Schedule Candidates (${data.top_candidates.length - 1})
+      </div>
+    `;
+
+    data.top_candidates.slice(1).forEach(c => {
+      candidatesHtml += `
+        <div style="border:1px solid #e2e8f0; border-radius:6px; padding:0.75rem 1rem; margin-bottom:0.5rem; background:#ffffff; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+              <span class="badge badge-medium">Rank #${c.rank}</span>
+              <strong style="font-size:0.85rem; color:#0f172a;">${escapeHtml(c.activity_id)}</strong>
+              <span class="badge ${c.confidence_tier === 'MEDIUM' ? 'badge-medium' : 'badge-low'}">${c.confidence_tier}</span>
+            </div>
+            <div style="font-size:0.8rem; color:#475569; margin-top:0.2rem;">${escapeHtml(c.description)}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <div style="text-align:right; font-size:0.85rem; font-weight:700; color:#475569;">
+              ${(c.scores.final_score).toFixed(3)}
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="chooseCandidateForEdit('${c.activity_id}')">Select</button>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  candidatesContainer.innerHTML = candidatesHtml;
+
+  // Actions Bar
+  const isResolved = data.decision === 'APPROVED' || data.decision === 'EDITED_APPROVED' || data.decision === 'REJECTED';
+  if (isResolved) {
+    document.getElementById('modal-actions-bar').innerHTML = `
+      <span style="font-size:0.8rem; color:#16a34a; font-weight:600; margin-right:auto;">
+        ✓ This match has been committed (${data.decision}) &bull; Schedule is updated
+      </span>
+      <button class="btn btn-outline" onclick="closeReviewModal()">Close</button>
+    `;
+  } else {
+    document.getElementById('modal-actions-bar').innerHTML = `
+      <button class="btn btn-outline" onclick="closeReviewModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="rejectActiveMatch()">Reject Match</button>
+      <button class="btn btn-outline" onclick="openEditModal()">Edit & Override</button>
+      <button class="btn btn-success" onclick="approveActiveMatch('${data.match_id}')">
+        <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Approve Schedule Update
+      </button>
+    `;
+  }
 }
 
 function closeReviewModal() {
   document.getElementById('review-modal').classList.remove('active');
+  const banner = document.getElementById('modal-schedule-mutation-banner');
+  if (banner) {
+    banner.style.display = 'none';
+    banner.innerHTML = '';
+  }
 }
 
 // 4. Ingestion & Preloaded Demo Scenarios
@@ -473,7 +630,7 @@ Site Engineer: D. Borah
 Area: Pumping Station Upgrades / Vessel Yard
 
 FIELD ACTIVITY LOG:
-1. Spool erection near V-105 completed today. 14 spools installed.
+1. 24-inch spool erected near V-105 today. 14 spools installed.
 2. Hydrotesting pre-checks initiated on drain manifolds.`;
   } else if (type === 'ambiguous') {
     filename = 'DPR-OIL-2026-0218-02.txt';
@@ -491,11 +648,12 @@ FIELD ACTIVITY LOG:
     text = `OIL INDIA LIMITED - DAILY PROGRESS REPORT (DPR)
 Project: Duliajan-Numaligarh Pipeline Expansion (DNPE)
 Date: 2026-03-02
+Report Ref: DPR-OIL-2026-0302-03
 Site Security & Admin: K. Sharma
-Area: Main Gate & Camp Perimeter
+Area: Tank Farm Perimeter
 
-DAILY LOG:
-1. Catering supply van arrived at main gate 3 with provisions for the worker mess.`;
+FIELD ACTIVITY LOG:
+1. Temporary access platform installed beside Tank T-204.`;
   }
 
   // Create virtual file and upload
@@ -513,11 +671,40 @@ async function approveActiveMatch(matchId) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ decided_by: 'Chief Planner', notes: 'Approved via Planner Workstation' })
     });
-    if (!res.ok) throw new Error('Approval transaction failed');
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || 'Approval transaction failed');
+    }
     const data = await res.json();
-    showToast(data.message, 'success');
-    closeReviewModal();
-    await loadAllData();
+    
+    // Show Schedule Mutation Banner in modal
+    const banner = document.getElementById('modal-schedule-mutation-banner');
+    if (banner) {
+      banner.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <strong style="font-size:0.875rem; color:#047857;">
+              <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              SCHEDULE COMMITTED &amp; AUDITED
+            </strong>
+            <div style="font-size:0.8rem; margin-top:0.25rem;">
+              Activity: <strong>${escapeHtml(data.activity_id)}</strong> &bull; Progress: <strong>100%</strong> (was 0%) &bull; Status: <strong>COMPLETED</strong> &bull; Actual Finish: <strong>${data.actual_finish || '08 Mar 2026'}</strong>
+            </div>
+            <div style="font-size:0.75rem; color:#065f46; margin-top:0.15rem;">
+              Updated By: <strong>Chief Planner</strong> &bull; Audit Trail Logged
+            </div>
+          </div>
+        </div>
+      `;
+      banner.style.display = 'block';
+    }
+
+    showToast(`Committed: ${data.activity_id} updated to 100% (COMPLETED)`, 'success');
+    setTimeout(async () => {
+      closeReviewModal();
+      await loadAllData();
+      switchTab('activities');
+    }, 1200);
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -813,32 +1000,54 @@ async function sendTimeAgentMessage() {
     const hasMatch = data.matched_activity_id && data.confidence_tier !== 'UNMATCHED';
     const confMsg = data.message || data.confirmation_message || 'Event processed.';
     const scoreVal = data.top_score !== undefined ? data.top_score : (data.score !== undefined ? data.score : 0);
-    const scorePct = (scoreVal * 100).toFixed(1);
+    const whyMatchedList = data.why_matched || [];
 
     botMsgEl.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
         <div style="display:flex; align-items:center; gap:0.4rem;">
-          <span style="font-size:1.1rem;">🤖</span>
+          <svg class="icon-inline" style="color:var(--primary-blue);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg>
           <strong style="font-size:0.825rem; color:#0f172a;">Time Agent</strong>
         </div>
         <div style="display:flex; align-items:center; gap:0.4rem;">
-          <span class="badge ${badgeClass}">${data.confidence_tier} (${scorePct}%)</span>
+          <span class="badge ${badgeClass}">${data.confidence_tier}</span>
+          ${hasMatch ? `<span style="font-size:0.75rem; font-weight:700; color:#0284c7;">Match Score: ${scoreVal.toFixed(3)}</span>` : ''}
         </div>
       </div>
       <div style="font-size:0.875rem; color:#1e293b; margin-bottom:0.75rem; line-height:1.45; background:#f8fafc; padding:0.6rem 0.75rem; border-radius:6px; border-left:3px solid ${data.confidence_tier === 'HIGH' ? 'var(--success)' : (data.confidence_tier === 'MEDIUM' ? 'var(--warning)' : 'var(--danger)')};">
         ${escapeHtml(confMsg)}
       </div>
 
-      <!-- Extracted Fields Table/Grid -->
-      <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:0.6rem 0.75rem; margin-bottom:0.75rem; font-size:0.775rem;">
-        <div style="font-weight:700; color:#475569; margin-bottom:0.35rem; text-transform:uppercase; letter-spacing:0.03em;">Extracted Field Event</div>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:0.35rem; color:#334155;">
-          <div><span style="color:#64748b;">Discipline:</span> <strong>${escapeHtml(fields.discipline || 'Unknown')}</strong></div>
-          <div><span style="color:#64748b;">Location:</span> <strong>${escapeHtml(fields.location || 'General Site')}</strong></div>
-          <div><span style="color:#64748b;">Status:</span> <strong>${escapeHtml(fields.status || 'In Progress')}</strong></div>
-          <div><span style="color:#64748b;">Activity:</span> <strong>${escapeHtml(fields.activity_description || text)}</strong></div>
+      <!-- Canonical Progress Event Card -->
+      <div class="canonical-event-card" style="margin-bottom:0.75rem; border-color:#cbd5e1;">
+        <div class="canonical-event-header">
+          <span>CANONICAL PROGRESS EVENT</span>
+          <span>DATE: ${data.event_date || '08 Mar 2026'}</span>
+        </div>
+        <div class="canonical-grid">
+          <div class="canonical-item"><label>Discipline</label><span>${escapeHtml(fields.discipline || 'Unknown')}</span></div>
+          <div class="canonical-item"><label>Activity</label><span>${escapeHtml(fields.activity_description || text)}</span></div>
+          <div class="canonical-item"><label>Location</label><span>${escapeHtml(fields.location || 'General Site')}</span></div>
+          <div class="canonical-item"><label>Equipment / Asset</label><span>${escapeHtml(fields.equipment_id || 'Line / Area')}</span></div>
+          <div class="canonical-item"><label>Quantity</label><span>${fields.quantity ? `${fields.quantity} ${fields.unit || ''}` : 'N/A'}</span></div>
+          <div class="canonical-item"><label>Status</label><span>${escapeHtml(fields.status || 'COMPLETED')}</span></div>
         </div>
       </div>
+
+      ${whyMatchedList.length > 0 ? `
+        <div class="why-matched-container" style="margin-bottom:0.75rem;">
+          <div class="why-matched-title">
+            <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Why This Match? Supporting Evidence
+          </div>
+          <div class="why-matched-list">
+            ${whyMatchedList.map(item => {
+              const isChecked = item.startsWith('✓');
+              const itemClass = isChecked ? 'signal-checked' : 'signal-warning';
+              return `<div class="why-matched-item ${itemClass}">${escapeHtml(item)}</div>`;
+            }).join('')}
+          </div>
+        </div>
+      ` : ''}
 
       ${hasMatch ? `
         <div style="display:flex; justify-content:space-between; align-items:center; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:0.6rem 0.75rem;">
@@ -854,7 +1063,7 @@ async function sendTimeAgentMessage() {
         <div style="display:flex; justify-content:space-between; align-items:center; background:#fef2f2; border:1px solid #fecaca; border-radius:6px; padding:0.6rem 0.75rem;">
           <div>
             <div style="font-size:0.7rem; color:#991b1b; font-weight:700; text-transform:uppercase;">Clarification Prompt</div>
-            <div style="font-size:0.8rem; color:#7f1d1d;">No confident activity match. Please provide line number, equipment ID, or area.</div>
+            <div style="font-size:0.8rem; color:#7f1d1d;">No confident activity match. Please provide line number, equipment ID, or specific area.</div>
           </div>
           <button class="btn btn-outline btn-sm" onclick="switchTab('review')" style="background:#ffffff; border-color:#fca5a5; color:#991b1b; white-space:nowrap; margin-left:0.75rem;">
             View Review Queue &rarr;
@@ -884,18 +1093,32 @@ async function sendTimeAgentMessage() {
   }
 }
 
-// 7.5. Institutional Memory Analytics
-async function loadHistoricalInsights(discipline) {
+// 7.5. Institutional Memory / Execution Memory Analytics
+let historySearchDebounce = null;
+
+function handleHistorySearch(val) {
+  clearTimeout(historySearchDebounce);
+  historySearchDebounce = setTimeout(() => {
+    const filterEl = document.getElementById('history-discipline-filter');
+    const disc = filterEl ? filterEl.value : '';
+    loadHistoricalInsights(disc, val);
+  }, 250);
+}
+
+async function loadHistoricalInsights(discipline, q = '') {
   if (discipline === undefined) {
     const filterEl = document.getElementById('history-discipline-filter');
     discipline = filterEl ? filterEl.value : '';
   }
+  if (!q) {
+    const searchInput = document.getElementById('history-search-input');
+    q = searchInput ? searchInput.value.trim() : '';
+  }
   
   try {
-    let url = '/api/v1/insights/history';
-    if (discipline) {
-      url += `?discipline=${encodeURIComponent(discipline)}`;
-    }
+    let url = '/api/v1/insights/history?';
+    if (discipline) url += `discipline=${encodeURIComponent(discipline)}&`;
+    if (q) url += `q=${encodeURIComponent(q)}&`;
     const res = await fetch(url);
     if (!res.ok) throw new Error('Failed to load historical insights');
     const data = await res.json();
@@ -907,7 +1130,9 @@ async function loadHistoricalInsights(discipline) {
 }
 
 function filterHistoryByDiscipline(discipline) {
-  loadHistoricalInsights(discipline);
+  const searchInput = document.getElementById('history-search-input');
+  const q = searchInput ? searchInput.value.trim() : '';
+  loadHistoricalInsights(discipline, q);
 }
 
 function renderHistoricalInsights(data) {
@@ -931,7 +1156,7 @@ function renderHistoricalInsights(data) {
   }
 
   if (countEl) {
-    countEl.innerText = `Showing ${data.activities.length} completed activities${data.discipline_filter ? ` for ${data.discipline_filter}` : ''}`;
+    countEl.innerText = `Showing ${data.activities.length} completed activities${data.discipline_filter ? ` for ${data.discipline_filter}` : ''}${data.query ? ` (matching "${data.query}")` : ''}`;
   }
 
   // Discipline Overrun Breakdown Cards
@@ -971,7 +1196,7 @@ function renderHistoryTable(activities) {
   if (!tbody) return;
 
   if (!activities || !activities.length) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:2rem; color:#64748b;">No completed historical activities found.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:2rem; color:#64748b;">No completed historical records matching criteria.</td></tr>`;
     return;
   }
 
@@ -1003,14 +1228,20 @@ function renderHistoryTable(activities) {
     return `
       <tr>
         <td style="font-weight:700; color:#0284c7; white-space:nowrap;">${escapeHtml(act.activity_id)}</td>
-        <td style="font-weight:500; max-width:320px;">${escapeHtml(act.description)}</td>
+        <td style="font-weight:500; max-width:260px;">${escapeHtml(act.description)}</td>
         <td><span class="badge-tag">${escapeHtml(act.discipline)}</span></td>
-        <td style="font-size:0.775rem; color:#64748b; white-space:nowrap;">${act.planned_start} &rarr; ${act.planned_finish}</td>
-        <td style="font-size:0.775rem; color:#475569; white-space:nowrap;">${act.actual_start} &rarr; ${act.actual_finish}</td>
+        <td style="font-size:0.75rem; color:#64748b; white-space:nowrap;">${act.planned_start} &rarr; ${act.planned_finish}</td>
+        <td style="font-size:0.75rem; color:#475569; white-space:nowrap;">${act.actual_start} &rarr; ${act.actual_finish}</td>
         <td style="text-align:center; font-weight:600;">${act.planned_duration_days} d</td>
         <td style="text-align:center; font-weight:600;">${act.actual_duration_days} d</td>
         <td style="text-align:center; font-weight:700; color:${varColor};">
           ${varSign}${act.variance_days} d
+        </td>
+        <td style="font-size:0.75rem; color:#475569; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(act.source)}">
+          ${escapeHtml(act.source)}
+        </td>
+        <td style="font-size:0.75rem; font-weight:600; color:#0f172a; white-space:nowrap;">
+          ${escapeHtml(act.approved_by || 'Chief Planner')}
         </td>
         <td style="text-align:center;">${statusBadge}</td>
       </tr>

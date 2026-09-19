@@ -2,6 +2,7 @@ from typing import Dict, Any, List
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from backend.app.models.entities import Project, Activity, FieldEvent, Match, AuditLog, DelayEvent
+from backend.app.core.config import settings
 
 class DashboardService:
     @staticmethod
@@ -26,11 +27,19 @@ class DashboardService:
 
         variance = round(calc_actual - calc_planned, 1)
 
+        # Compute delayed activities dynamically based on schedule variance and planned finish dates
+        effective_date = settings.get_effective_date()
+        delayed_acts = sum(
+            1 for a in activities
+            if (a.planned_progress > a.actual_progress + 5.0 and a.status != "COMPLETED") or
+               (a.planned_finish and a.planned_finish < effective_date and a.actual_progress < 100.0)
+        )
+
         # Count events and matches
         events = db.query(FieldEvent).all()
         total_events = len(events)
         
-        # Matches by status & confidence
+        # Matches by status & confidence (Only active pending reviews)
         pending_matches = db.query(Match).filter(Match.decision == "PENDING", Match.rank == 1).all()
         pending_reviews = len(pending_matches)
         
@@ -49,13 +58,14 @@ class DashboardService:
             .all()
         )
 
-        # S-Curve generation (Bi-weekly planned vs actual milestones)
+        # S-Curve generation: DEMO PLANNED vs ACTUAL VIEW
+        # Anchored to planned schedule milestones with dynamic current actual progress
         s_curve = [
             {"milestone": "Jan 15", "planned": 5.0, "actual": 4.8},
             {"milestone": "Jan 30", "planned": 16.0, "actual": 14.5},
             {"milestone": "Feb 15", "planned": 32.0, "actual": 28.0},
             {"milestone": "Feb 28", "planned": 48.0, "actual": 41.2},
-            {"milestone": "Mar 15 (Current)", "planned": calc_planned, "actual": calc_actual},
+            {"milestone": f"Mar 08 (Current: {effective_date})", "planned": calc_planned, "actual": calc_actual},
             {"milestone": "Mar 31", "planned": 76.0, "actual": None},
             {"milestone": "Apr 15", "planned": 88.0, "actual": None},
             {"milestone": "Apr 30", "planned": 100.0, "actual": None}
@@ -64,6 +74,9 @@ class DashboardService:
         return {
             "project_id": project.id,
             "project_name": project.name,
+            "demo_date": effective_date,
+            "demo_mode": settings.DEMO_MODE,
+            "chart_label": "DEMO PLANNED vs ACTUAL VIEW",
             "planned_progress": calc_planned,
             "actual_progress": calc_actual,
             "schedule_variance": variance,
@@ -71,7 +84,7 @@ class DashboardService:
             "completed_activities": completed_acts,
             "in_progress_activities": in_progress_acts,
             "not_started_activities": not_started_acts,
-            "delayed_activities": 3,
+            "delayed_activities": delayed_acts,
             "total_events": total_events,
             "pending_reviews": pending_reviews,
             "high_confidence_matches": high_conf,
@@ -81,3 +94,4 @@ class DashboardService:
             "recent_approved_updates": recent_audits,
             "planned_vs_actual_curve": s_curve
         }
+

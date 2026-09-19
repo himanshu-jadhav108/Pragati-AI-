@@ -162,6 +162,118 @@ class MatchingEngine:
         reason_str = "; ".join(contradiction_reasons) if contradiction_reasons else None
         return penalty, reason_str
 
+    def _filter_contextual_candidates(self, event: Any) -> List[Tuple[int, Activity]]:
+        """
+        Lightweight candidate pre-filtering pipeline:
+        ALL SCHEDULE ACTIVITIES -> CONTEXTUAL CANDIDATES -> (Fallback to all if too narrow)
+        """
+        if not self.activities:
+            return []
+
+        event_text = (getattr(event, "raw_text", None) or getattr(event, "evidence_text", "") or "").lower()
+        event_disc = (getattr(event, "discipline", None) or "").lower()
+        event_loc = (getattr(event, "location", None) or "").lower()
+        event_eq = (getattr(event, "equipment_id", None) or "").lower()
+
+        contextual = []
+        for idx, act in enumerate(self.activities):
+            act_disc = (act.discipline or "").lower()
+            act_loc = (act.location or "").lower()
+            act_eq = (act.equipment_id or "").lower()
+            act_desc = (act.description or "").lower()
+
+            # Signals
+            disc_match = bool(event_disc and (event_disc == act_disc or self._calculate_discipline_score(event_disc, act_disc) > 0.3))
+            loc_match = bool(event_loc and (event_loc in act_loc or act_loc in event_loc or act_loc in event_text))
+            eq_match = bool(event_eq and (event_eq in act_eq or act_eq in event_text))
+            
+            # Key activity token overlap
+            tokens = [t for t in re.findall(r"\b[a-z0-9\-]+\b", event_text) if len(t) > 3 and t not in {"today", "yesterday", "completed", "installed", "ongoing", "started", "area"}]
+            token_match = any(t in act_desc for t in tokens)
+
+            if disc_match or loc_match or eq_match or token_match:
+                contextual.append((idx, act))
+
+        # Fallback to all activities if filtering would make candidate pool too small
+        if len(contextual) < 5:
+            return list(enumerate(self.activities))
+        return contextual
+
+    def _generate_why_matched(self, event: Any, act: Activity, scores: MatchComponentScores, event_text: str) -> List[str]:
+        """
+        Generates truthful, factual evidence checklist for 'Why This Match?'.
+        Only displays checkmarks where the evidence signal actually contributed.
+        """
+        signals: List[str] = []
+        act_desc = act.description.lower()
+        ev_text_low = event_text.lower()
+
+        # 1. Discipline signal
+        if scores.score_discipline >= 0.9:
+            signals.append(f"✓ {act.discipline} discipline matched")
+        elif scores.score_discipline >= 0.4:
+            signals.append(f"✓ Compatible discipline ({act.discipline})")
+        elif getattr(event, "discipline", None):
+            signals.append(f"⚠ Discipline mismatch ({act.discipline})")
+
+        # 2. Location signal
+        if scores.score_location >= 0.7:
+            loc_name = act.location or getattr(event, "location", "")
+            signals.append(f"✓ {loc_name} location confirmed")
+        elif getattr(event, "location", None) or act.location:
+            signals.append("⚠ Location not confirmed")
+
+        # 3. Equipment / Asset signal
+        if scores.score_entity >= 0.7:
+            eq_name = act.equipment_id or getattr(event, "equipment_id", "")
+            signals.append(f"✓ {eq_name} attribute/asset matched")
+        elif getattr(event, "equipment_id", None) and act.equipment_id:
+            signals.append("⚠ Asset unverified")
+
+        # 4. Contextual size / line attribute
+        for attr in ["24-inch", "24\"", "14-inch", "14\"", "18-inch", "12-inch", "suction", "discharge", "booster"]:
+            if attr in ev_text_low and (attr in act_desc or (attr == "24\"" and "24-inch" in act_desc)):
+                signals.append(f"✓ {attr.replace('\"', '-inch')} attribute")
+                break
+
+        # 5. Engineering Activity verb
+        action_verbs = [
+            ("erect", "Erection activity"),
+            ("weld", "Welding activity"),
+            ("pour", "Concrete pour activity"),
+            ("concrete", "Civil concrete activity"),
+            ("excavat", "Excavation activity"),
+            ("hydrotest", "Hydrotest activity"),
+            ("align", "Alignment activity"),
+            ("cable", "Cable installation activity"),
+            ("loop", "Loop check activity"),
+            ("install", "Installation activity")
+        ]
+        for stem, label in action_verbs:
+            if stem in ev_text_low and stem in act_desc:
+                signals.append(f"✓ {label}")
+                break
+
+        # 6. Schedule Temporal Context
+        if scores.score_temporal >= 0.8:
+            signals.append("✓ Schedule context aligned")
+        else:
+            signals.append("⚠ Outside planned schedule window")
+
+        # 7. Semantic text similarity
+        if scores.score_semantic >= 0.45:
+            signals.append(f"✓ Strong text similarity ({scores.score_semantic:.2f})")
+        elif scores.score_semantic >= 0.25:
+            signals.append(f"✓ Moderate text similarity ({scores.score_semantic:.2f})")
+        else:
+            signals.append("⚠ Low text similarity")
+
+        # 8. Contradictions
+        if scores.penalty_contradiction > 0:
+            signals.append(f"⚠ Contradiction penalty (-{scores.penalty_contradiction:.2f})")
+
+        return signals
+
     def score_event(self, event: Any, top_k: int = 5) -> Tuple[List[MatchCandidate], str]:
         if not self.activities:
             return [], "UNMATCHED"
@@ -172,6 +284,9 @@ class MatchingEngine:
         query = f"{event.activity_description or ''} {event.discipline or ''} {event.location or ''} {event.evidence_text or ''}"
         semantic_sims = self.semantic_scorer.compute_similarity(query)
 
+        # Candidate filtering: ALL ACTIVITIES -> CONTEXTUAL CANDIDATES
+        contextual_candidates = self._filter_contextual_candidates(event)
+
         candidates: List[MatchCandidate] = []
 
         w_sem = settings.WEIGHT_SEMANTIC
@@ -180,7 +295,7 @@ class MatchingEngine:
         w_loc = settings.WEIGHT_LOCATION
         w_temp = settings.WEIGHT_TEMPORAL
 
-        for idx, act in enumerate(self.activities):
+        for idx, act in contextual_candidates:
             s_sem = float(semantic_sims[idx])
             s_disc = self._calculate_discipline_score(event.discipline, act.discipline)
             s_ent = self._calculate_entity_score(event.equipment_id, act.equipment_id, event_text)
@@ -199,21 +314,6 @@ class MatchingEngine:
             )
             final_score = max(0.0, min(1.0, raw_score - penalty))
 
-            # Generate rationale
-            rationale_parts = []
-            if s_sem >= 0.4:
-                rationale_parts.append(f"Strong semantic overlap ({s_sem:.2f})")
-            if s_loc >= 0.9:
-                rationale_parts.append(f"Matched location '{act.location}'")
-            if s_ent >= 0.9:
-                rationale_parts.append(f"Matched equipment '{act.equipment_id}'")
-            if s_disc >= 0.9:
-                rationale_parts.append(f"Matched discipline '{act.discipline}'")
-            if s_temp >= 0.8:
-                rationale_parts.append("Aligned with planned schedule window")
-            
-            rationale = ", ".join(rationale_parts) if rationale_parts else "Weak contextual correlation"
-
             scores = MatchComponentScores(
                 score_semantic=round(s_sem, 3),
                 score_discipline=round(s_disc, 3),
@@ -223,6 +323,9 @@ class MatchingEngine:
                 penalty_contradiction=round(penalty, 3),
                 final_score=round(final_score, 3)
             )
+
+            why_matched = self._generate_why_matched(event, act, scores, event_text)
+            rationale = "; ".join([s for s in why_matched if s.startswith("✓")]) or "Weak contextual correlation"
 
             candidates.append(MatchCandidate(
                 activity_id=act.activity_id,
@@ -236,7 +339,8 @@ class MatchingEngine:
                 rank=1,
                 confidence_tier="LOW",
                 rationale=rationale,
-                contradictions=contradictions
+                contradictions=contradictions,
+                why_matched=why_matched
             ))
 
         # Sort candidates descending by final_score
@@ -263,7 +367,7 @@ class MatchingEngine:
                 rank1.scores.score_discipline >= 0.9
             )
 
-            # Confidence policy from prompt 06
+            # Prototype routing thresholds
             if (rank1.scores.final_score >= settings.THRESHOLD_HIGH and
                 has_corroborating and
                 margin >= settings.MARGIN_HIGH_CONFIDENCE):
@@ -276,21 +380,93 @@ class MatchingEngine:
                 overall_confidence = "LOW"
                 rank1.confidence_tier = "LOW"
 
-            # Check for close competition downgrade (Ambiguous case)
+            # Ambiguous close competition downgrade: routes to MEDIUM (Planner Review Required)
             if overall_confidence == "HIGH" and margin < settings.MARGIN_HIGH_CONFIDENCE:
                 overall_confidence = "MEDIUM"
                 rank1.confidence_tier = "MEDIUM"
-                rank1.rationale += f" [Confidence adjusted to MEDIUM: close margin {margin:.2f} with rank 2]"
+                rank1.rationale += f" [Close competitor within margin {margin:.2f} — Planner Review Required]"
 
         return top_candidates, overall_confidence
 
+    def get_stored_matches(self, event: FieldEvent) -> Optional[EventMatchesResponse]:
+        """
+        Read-only retrieval of existing match records.
+        Does NOT delete, recreate, or mutate database state.
+        """
+        existing_matches = (
+            self.db.query(Match)
+            .filter(Match.event_id == event.id)
+            .order_by(Match.rank.asc())
+            .all()
+        )
+        if not existing_matches:
+            return None
+
+        from backend.app.schemas.schemas import FieldEventResponse, DocumentResponse
+        event_resp = FieldEventResponse.model_validate(event)
+        doc_resp = DocumentResponse.model_validate(event.document) if event.document else None
+
+        candidates = []
+        overall_conf = existing_matches[0].confidence_tier if existing_matches else "UNMATCHED"
+        rec_id = existing_matches[0].activity_id if existing_matches and overall_conf != "UNMATCHED" else None
+        top_score = existing_matches[0].final_score if existing_matches else 0.0
+
+        for m in existing_matches:
+            act = m.candidate_activity
+            scores = MatchComponentScores(
+                score_semantic=m.score_semantic,
+                score_discipline=m.score_discipline,
+                score_entity=m.score_entity,
+                score_location=m.score_location,
+                score_temporal=m.score_temporal,
+                penalty_contradiction=m.penalty_contradiction,
+                final_score=m.final_score
+            )
+            why_matched = []
+            if m.rationale:
+                # Reconstruct checklist
+                why_matched = [s.strip() for s in m.rationale.split(";") if s.strip()]
+            if act:
+                why_matched = self._generate_why_matched(event, act, scores, event.raw_text or event.evidence_text or "")
+
+            candidates.append(MatchCandidate(
+                activity_id=m.activity_id or "NONE",
+                description=act.description if act else "No activity assigned",
+                discipline=act.discipline if act else "Unknown",
+                location=act.location if act else None,
+                equipment_id=act.equipment_id if act else None,
+                current_actual_progress=act.actual_progress if act else 0.0,
+                current_status=act.status if act else "NOT_STARTED",
+                scores=scores,
+                rank=m.rank,
+                confidence_tier=m.confidence_tier,
+                rationale=m.rationale or "",
+                contradictions=m.contradictions,
+                why_matched=why_matched
+            ))
+
+        return EventMatchesResponse(
+            event=event_resp,
+            source_document=doc_resp,
+            top_candidates=candidates,
+            confidence_tier=overall_conf,
+            match_score=round(top_score, 3),
+            recommended_activity_id=rec_id,
+            decision=existing_matches[0].decision if existing_matches else "PENDING",
+            match_id=existing_matches[0].id if existing_matches else None
+        )
+
     def process_and_persist_matches(self, event: FieldEvent) -> EventMatchesResponse:
+        """
+        Executes matching computation and persists new candidate records in the database.
+        Called on event creation or explicit recomputation.
+        """
         top_candidates, overall_confidence = self.score_event(event, top_k=5)
 
         # Clear existing unapproved matches for this event
         self.db.query(Match).filter(
             Match.event_id == event.id,
-            Match.decision == "PENDING"
+            Match.decision.in_(["PENDING", "UNMATCHED"])
         ).delete()
 
         recommended_id = None
@@ -301,6 +477,7 @@ class MatchingEngine:
 
         # Persist candidate records in DB
         for c in top_candidates:
+            rationale_text = "; ".join(c.why_matched) if c.why_matched else c.rationale
             m = Match(
                 event_id=event.id,
                 activity_id=c.activity_id,
@@ -313,7 +490,7 @@ class MatchingEngine:
                 final_score=c.scores.final_score,
                 rank=c.rank,
                 confidence_tier=overall_confidence if c.rank == 1 else "LOW",
-                rationale=c.rationale,
+                rationale=rationale_text,
                 contradictions=c.contradictions,
                 decision="UNMATCHED" if overall_confidence == "UNMATCHED" else "PENDING"
             )
@@ -327,15 +504,18 @@ class MatchingEngine:
 
         # Build response schema
         from backend.app.schemas.schemas import FieldEventResponse, DocumentResponse
-        event_resp = FieldEventResponse.from_orm(event)
-        doc_resp = DocumentResponse.from_orm(event.document) if event.document else None
+        event_resp = FieldEventResponse.model_validate(event)
+        doc_resp = DocumentResponse.model_validate(event.document) if event.document else None
+        top_score = top_candidates[0].scores.final_score if top_candidates else 0.0
 
         return EventMatchesResponse(
             event=event_resp,
             source_document=doc_resp,
             top_candidates=top_candidates,
             confidence_tier=overall_confidence,
+            match_score=round(top_score, 3),
             recommended_activity_id=recommended_id,
             decision="UNMATCHED" if overall_confidence == "UNMATCHED" else "PENDING",
             match_id=top_match_id
         )
+

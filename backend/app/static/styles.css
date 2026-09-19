@@ -1,4 +1,4 @@
-/* PRAGATI AI - Enterprise Planner Workstation Styles */
+/* InfraNexus AI - Enterprise Planner Workstation Styles */
 :root {
   --bg-main: #f8fafc;
   --bg-card: #ffffff;
@@ -1109,4 +1109,183 @@ body {
     font-size: 0.75rem;
   }
 }
+
+/* =========================================================
+   InfraNexus AI — Industrial Enterprise Enhancements
+   ========================================================= */
+
+/* Deterministic Demo Mode Badge */
+.demo-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: #0f172a;
+  color: #f8fafc;
+  border: 1px solid #334155;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+}
+
+.demo-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7);
+  animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(56, 189, 248, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+}
+
+/* Clean Enterprise SVG Icons */
+.icon-svg {
+  width: 15px;
+  height: 15px;
+  vertical-align: -2px;
+  display: inline-block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  margin-right: 0.35rem;
+}
+
+.icon-inline {
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+}
+
+/* Canonical Progress Event Card */
+.canonical-event-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-top: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+.canonical-event-header {
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 0.35rem;
+}
+
+.canonical-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.5rem;
+  font-size: 0.775rem;
+}
+
+.canonical-item label {
+  display: block;
+  font-size: 0.68rem;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.canonical-item span {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Why This Match? Evidence Checklist */
+.why-matched-container {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-top: 0.75rem;
+}
+
+.why-matched-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.why-matched-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.why-matched-item {
+  font-size: 0.775rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.why-matched-item.signal-checked {
+  color: #065f46;
+  font-weight: 500;
+}
+
+.why-matched-item.signal-warning {
+  color: #9a3412;
+}
+
+/* Schedule Mutation Success Notice */
+.schedule-updated-banner {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-left: 4px solid #10b981;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  color: #065f46;
+}
+
+.schedule-updated-banner strong {
+  color: #047857;
+}
+
+/* Execution Memory Search */
+.history-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.75rem;
+  width: 100%;
+  max-width: 380px;
+}
+
+.history-search-input {
+  border: none;
+  outline: none;
+  font-size: 0.825rem;
+  width: 100%;
+  color: #0f172a;
+}
+
 

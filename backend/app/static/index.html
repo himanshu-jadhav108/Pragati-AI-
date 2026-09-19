@@ -30,12 +30,17 @@
         </div>
       </div>
       <div class="header-actions">
-        <div class="provider-pill">
-          <span class="status-dot"></span>
-          <span class="provider-pill-text">System: Operational</span>
+        <div class="demo-mode-badge" title="Deterministic Selection Round Demo Mode">
+          <span class="demo-pulse"></span>
+          <span>DEMO MODE &bull; Data as of 08 Mar 2026</span>
         </div>
-        <button class="btn btn-outline btn-sm reset-btn" onclick="triggerDemoReset()">
-          🔄 Reset<span class="hide-on-mobile"> Demo</span>
+        <div class="provider-pill hide-on-mobile">
+          <span class="status-dot"></span>
+          <span class="provider-pill-text">AI Engine: Deterministic Fallback</span>
+        </div>
+        <button class="btn btn-outline btn-sm reset-btn" onclick="triggerDemoReset()" title="Reset database to clean demo baseline">
+          <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          <span class="hide-on-mobile">Reset Demo</span>
         </button>
       </div>
     </div>
@@ -45,30 +50,37 @@
   <nav class="nav-tabs-bar">
     <div class="nav-container">
       <button class="nav-tab active" data-tab="overview">
-        📊 Executive Dashboard
+        <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Overview
       </button>
       <button class="nav-tab" data-tab="ingestion">
-        📥 Field DPR Ingestion
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Field Ingestion
       </button>
       <button class="nav-tab" data-tab="timeagent">
-        💬 Time Agent
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Time Agent (Capture)
       </button>
       <button class="nav-tab" data-tab="review">
-        ⚖️ Planner Review Queue <span class="tab-badge" id="queue-count-badge">0</span>
+        <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+        Review Queue <span class="tab-badge" id="queue-count-badge">0</span>
       </button>
       <button class="nav-tab" data-tab="activities">
-        📋 Schedule Activities (L5/L6)
+        <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Schedule Master
       </button>
       <button class="nav-tab" data-tab="audit">
-        📜 Governance Audit Trail
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Audit Trail
       </button>
       <button class="nav-tab" data-tab="history">
-        📚 Institutional Memory
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Execution Memory
       </button>
       <button class="nav-tab" data-tab="system">
-        ⚙️ System Health & Info
+        <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        System Config
       </button>
-
     </div>
   </nav>
 
@@ -97,7 +109,7 @@
         <div class="metric-card">
           <div class="metric-header">
             <span class="metric-label">Planned Progress</span>
-            <span class="metric-icon">📅</span>
+            <svg class="icon-inline" style="color:#0284c7;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           </div>
           <div class="metric-val" id="metric-planned">--%</div>
           <div class="metric-sub">Primavera P6 Baseline</div>
@@ -105,15 +117,15 @@
         <div class="metric-card">
           <div class="metric-header">
             <span class="metric-label">Actual Progress</span>
-            <span class="metric-icon">🏗️</span>
+            <svg class="icon-inline" style="color:#0d9488;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           </div>
           <div class="metric-val" id="metric-actual">--%</div>
-          <div class="metric-sub">Audited & Approved Updates</div>
+          <div class="metric-sub">Audited & Committed Updates</div>
         </div>
         <div class="metric-card">
           <div class="metric-header">
             <span class="metric-label">Schedule Variance</span>
-            <span class="metric-icon">⚡</span>
+            <svg class="icon-inline" style="color:#d97706;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
           </div>
           <div class="metric-val" id="metric-variance">--%</div>
           <div class="metric-sub">Deviation from P6 schedule</div>
@@ -121,7 +133,7 @@
         <div class="metric-card">
           <div class="metric-header">
             <span class="metric-label">Pending Reviews</span>
-            <span class="metric-icon">⏳</span>
+            <svg class="icon-inline" style="color:#0284c7;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
           <div class="metric-val" id="metric-pending" style="color:#0284c7;">--</div>
           <div class="metric-sub">Awaiting planner approval</div>
@@ -129,7 +141,7 @@
         <div class="metric-card">
           <div class="metric-header">
             <span class="metric-label">High Conf. Matches</span>
-            <span class="metric-icon">🎯</span>
+            <svg class="icon-inline" style="color:#16a34a;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
           </div>
           <div class="metric-val" id="metric-high-matches" style="color:#16a34a;">--</div>
           <div class="metric-sub">Corroborated top candidates</div>
@@ -137,10 +149,10 @@
         <div class="metric-card">
           <div class="metric-header">
             <span class="metric-label">Unmatched Events</span>
-            <span class="metric-icon">❓</span>
+            <svg class="icon-inline" style="color:#64748b;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           </div>
           <div class="metric-val" id="metric-unmatched" style="color:#64748b;">--</div>
-          <div class="metric-sub">No schedule mutation</div>
+          <div class="metric-sub">Safely isolated from schedule</div>
         </div>
       </div>
 
@@ -149,13 +161,17 @@
         <!-- Planned vs Actual Curve -->
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">📈 S-Curve: Planned vs Actual Progress</h3>
+            <h3 class="card-title">
+              <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              S-Curve: Planned Baseline vs Actual Audited Progress
+            </h3>
             <div style="display:flex; gap:1rem; font-size:0.75rem; font-weight:600;">
               <span style="color:#0284c7;">-- Planned Baseline</span>
               <span style="color:#0d9488;">— Actual Audited</span>
             </div>
           </div>
           <div class="card-body">
+            <div style="font-size:0.725rem; color:#64748b; margin-bottom:0.5rem;">[DEMO PLANNED vs ACTUAL VIEW &bull; Milestones linked to Primavera baseline]</div>
             <div id="scurve-chart" class="chart-container"></div>
           </div>
         </div>
@@ -163,7 +179,10 @@
         <!-- Activity Status Breakdown -->
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">📊 Schedule Activity Distribution</h3>
+            <h3 class="card-title">
+              <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><pie fill="none"/></svg>
+              Schedule Activity Distribution
+            </h3>
           </div>
           <div class="card-body">
             <div style="margin-bottom:1.25rem;">
@@ -240,17 +259,21 @@
             <!-- Pre-loaded Demo Scenarios -->
             <div style="border-top:1px solid #e2e8f0; padding-top:1rem;">
               <h4 style="font-size:0.85rem; font-weight:700; margin-bottom:0.6rem; color:#0f172a;">
-                ⚡ Quick Demo Scenarios (One-Click)
+                <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Controlled Demo Scenarios (One-Click)
               </h4>
               <div style="display:flex; flex-direction:column; gap:0.5rem;" class="demo-scenarios-list">
                 <button class="btn btn-outline" style="justify-content:flex-start;" onclick="loadDemoScenario('hero')">
-                  🌟 <strong>Hero Case:</strong> Spool erection near V-105 (14 spools) &rarr; Expected HIGH Match
+                  <span class="badge badge-high" style="margin-right:0.5rem;">CASE A: HIGH</span>
+                  <strong>Spool erection near V-105 (24-inch spool)</strong> &rarr; PIP-L6-0427
                 </button>
                 <button class="btn btn-outline" style="justify-content:flex-start;" onclick="loadDemoScenario('ambiguous')">
-                  ⚖️ <strong>Ambiguous Case:</strong> Suction line welding at PH-1 &rarr; Expected MEDIUM Match
+                  <span class="badge badge-medium" style="margin-right:0.5rem;">CASE B: MEDIUM</span>
+                  <strong>Suction line welding at PH-1</strong> &rarr; Multiple Candidates (Review Required)
                 </button>
                 <button class="btn btn-outline" style="justify-content:flex-start;" onclick="loadDemoScenario('unmatched')">
-                  🛑 <strong>Unmatched Case:</strong> Catering van delivery at gate 3 &rarr; Expected UNMATCHED
+                  <span class="badge badge-unmatched" style="margin-right:0.5rem;">CASE C: NO MATCH</span>
+                  <strong>Temporary access platform near T-204</strong> &rarr; Unmatched / Isolated
                 </button>
               </div>
             </div>
@@ -281,9 +304,12 @@
       <div class="card timeagent-card">
         <div class="card-header timeagent-header" style="background: #ffffff; border-bottom: 1px solid var(--border-subtle);">
           <div>
-            <h3 class="card-title">💬 Time Agent — Field Supervisor Conversational Logger</h3>
+            <h3 class="card-title">
+              <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Time Agent &mdash; Conversational Field Progress Logger
+            </h3>
             <p style="font-size: 0.775rem; color: #64748b; margin-top: 0.2rem;">
-              Alternative to document upload: Speak or type site updates naturally. AI extracts facts and queues matches for planner approval.
+              Site supervisor direct input: Type natural field observations. AI extracts facts into a Canonical Progress Event and links to L5/L6 schedule.
             </p>
           </div>
           <div style="display:flex; align-items:center; gap:0.5rem;">
@@ -297,30 +323,30 @@
           <!-- Initial Welcome Message from System -->
           <div class="chat-msg chat-system" style="align-self: flex-start; max-width: 82%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px 12px 12px 2px; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
             <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem;">
-              <span style="font-size:1.1rem;">🤖</span>
+              <svg class="icon-inline" style="color:var(--primary-blue);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>
               <strong style="font-size:0.825rem; color:#0f172a;">Time Agent (InfraNexus AI)</strong>
-              <span style="font-size:0.7rem; color:#94a3b8;">System Ready</span>
+              <span style="font-size:0.7rem; color:#94a3b8;">Deterministic Engine Ready</span>
             </div>
             <p style="font-size:0.85rem; color:#334155; margin:0; line-height:1.45;">
-              Hello Site Supervisor! Log today's field progress directly in natural text. I will extract structured engineering attributes, match against the baseline schedule, and route to the Planner Review Queue.
+              Hello Site Supervisor! Log field progress in natural text. The system extracts a <strong>Canonical Progress Event</strong>, finds the corresponding L5/L6 schedule activity, presents evidence, and submits to the Planner Review Queue.
             </p>
           </div>
         </div>
 
         <!-- Quick reply suggestion buttons -->
         <div class="timeagent-quick-replies">
-          <span style="font-size: 0.75rem; font-weight: 600; color: #64748b; flex-shrink: 0;">⚡ Quick Demos:</span>
-          <button class="btn btn-outline btn-sm" onclick="sendQuickReply('Spool erection near V-105 completed today. 14 spools installed.')">
-            Spool erected near V-105
+          <span style="font-size: 0.75rem; font-weight: 600; color: #64748b; flex-shrink: 0;">⚡ Demo Scenarios:</span>
+          <button class="btn btn-outline btn-sm" onclick="sendQuickReply('24-inch spool erected near V-105 today.')" title="Hero Case: High Confidence Match to PIP-L6-0427">
+            <span class="badge badge-high" style="font-size:0.65rem; padding:0.1rem 0.35rem;">HIGH</span> 24-inch spool at V-105
           </button>
-          <button class="btn btn-outline btn-sm" onclick="sendQuickReply('Foundation concrete poured at Pump House PH-2. 45 cum completed.')">
-            Foundation concrete at PH-2
+          <button class="btn btn-outline btn-sm" onclick="sendQuickReply('Suction line welding in progress at Pump House PH-1.')" title="Ambiguous Case: Multiple Candidates Require Review">
+            <span class="badge badge-medium" style="font-size:0.65rem; padding:0.1rem 0.35rem;">MEDIUM</span> Suction line welding at PH-1
           </button>
-          <button class="btn btn-outline btn-sm" onclick="sendQuickReply('Suction line welding ongoing at Pump House PH-1. 6 joints welded.')">
-            Suction line welding at PH-1
+          <button class="btn btn-outline btn-sm" onclick="sendQuickReply('Temporary access platform installed beside Tank T-204.')" title="No Match Case: Safely Isolated">
+            <span class="badge badge-unmatched" style="font-size:0.65rem; padding:0.1rem 0.35rem;">NO MATCH</span> Platform near T-204
           </button>
-          <button class="btn btn-outline btn-sm" onclick="sendQuickReply('Catering lunch delivery van arrived at security gate 3.')">
-            Catering delivery at gate
+          <button class="btn btn-outline btn-sm" onclick="sendQuickReply('Foundation concrete poured at Pump House PH-2. 45 cum completed.')" title="Partial Quantity Case">
+            <span class="badge badge-high" style="font-size:0.65rem; padding:0.1rem 0.35rem;">PARTIAL</span> Concrete at PH-2
           </button>
         </div>
 
@@ -339,12 +365,16 @@
 
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">⚖️ Human-in-the-Loop Review Queue</h3>
+          <h3 class="card-title">
+            <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Human-in-the-Loop Planner Review Queue
+          </h3>
           <div class="chip-filter-row">
-            <button class="btn btn-outline btn-sm" onclick="loadReviewQueue()">All</button>
-            <button class="btn btn-outline btn-sm" onclick="loadReviewQueue('HIGH')">High Confidence</button>
-            <button class="btn btn-outline btn-sm" onclick="loadReviewQueue('MEDIUM')">Medium (Review)</button>
-            <button class="btn btn-outline btn-sm" onclick="loadReviewQueue('UNMATCHED')">Unmatched</button>
+            <button class="btn btn-outline btn-sm active-filter-btn" id="rq-btn-all" onclick="filterQueue(null, 'pending')">All Pending</button>
+            <button class="btn btn-outline btn-sm" id="rq-btn-high" onclick="filterQueue('HIGH', 'pending')">High Confidence</button>
+            <button class="btn btn-outline btn-sm" id="rq-btn-med" onclick="filterQueue('MEDIUM', 'pending')">Medium (Review)</button>
+            <button class="btn btn-outline btn-sm" id="rq-btn-unm" onclick="filterQueue('UNMATCHED', 'pending')">Unmatched</button>
+            <button class="btn btn-outline btn-sm" id="rq-btn-res" onclick="filterQueue(null, 'resolved')" style="border-left: 2px solid #cbd5e1; margin-left: 0.25rem;">Resolved History</button>
           </div>
         </div>
         <div class="data-table-container">
@@ -352,12 +382,12 @@
             <thead>
               <tr>
                 <th>Confidence & Score</th>
-                <th>Extracted Field Event</th>
+                <th>Canonical Progress Event</th>
                 <th>AI Top Candidate Activity</th>
                 <th>Discipline</th>
                 <th>Location</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>Decision Status</th>
+                <th>Governance Action</th>
               </tr>
             </thead>
             <tbody id="review-queue-body">
@@ -436,14 +466,18 @@
       <div class="history-header-card">
         <div>
           <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">
-            📚 Institutional Memory — Historical Schedule Execution Analytics
+            <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            Execution Memory &mdash; Institutional Schedule Knowledge
           </h2>
           <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">
-            Every approved update feeds this record — a growing, queryable history of what actually happened, for future project planning.
+            Every approved update feeds this audited execution record &mdash; preserving planned vs actual durations, variance, and field provenance.
           </p>
         </div>
-        <div class="history-filter-wrap" style="display:flex; align-items:center; gap:0.75rem;">
-          <label style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); white-space:nowrap;">Filter Discipline:</label>
+        <div class="history-filter-wrap" style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+          <div class="history-search-bar">
+            <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="history-search-input" class="history-search-input" placeholder="Search execution memory (e.g. piping erection V-105)..." oninput="handleHistorySearch(this.value)">
+          </div>
           <select id="history-discipline-filter" onchange="filterHistoryByDiscipline(this.value)" style="padding:0.45rem 0.75rem; border-radius:var(--radius-sm); border:1px solid #cbd5e1; font-size:0.825rem;">
             <option value="">All Disciplines</option>
             <option value="Civil">Civil</option>
@@ -461,7 +495,7 @@
         <div class="metric-card">
           <div class="metric-header">
             <span class="metric-label">Completed Activities</span>
-            <span class="metric-icon">🏁</span>
+            <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <div class="metric-val" id="hist-metric-completed">--</div>
           <div class="metric-sub">Historical verified records</div>
@@ -469,7 +503,7 @@
         <div class="metric-card">
           <div class="metric-header">
             <span class="metric-label">Overrun Activities</span>
-            <span class="metric-icon">⚠️</span>
+            <svg class="icon-inline" style="color:var(--danger);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           </div>
           <div class="metric-val" id="hist-metric-overruns" style="color:var(--danger);">--</div>
           <div class="metric-sub">Exceeded planned duration</div>
@@ -477,7 +511,7 @@
         <div class="metric-card">
           <div class="metric-header">
             <span class="metric-label">On-Time / Ahead</span>
-            <span class="metric-icon">✅</span>
+            <svg class="icon-inline" style="color:var(--success);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
           <div class="metric-val" id="hist-metric-ontime" style="color:var(--success);">--</div>
           <div class="metric-sub">Met or beat planned schedule</div>
@@ -485,7 +519,7 @@
         <div class="metric-card">
           <div class="metric-header">
             <span class="metric-label">Avg Schedule Variance</span>
-            <span class="metric-icon">⏱️</span>
+            <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           </div>
           <div class="metric-val" id="hist-metric-avg-var">-- d</div>
           <div class="metric-sub">Project-wide duration deviation</div>
@@ -495,7 +529,10 @@
       <!-- Discipline Overrun Breakdown Cards -->
       <div class="card" style="margin-bottom: 1.5rem;">
         <div class="card-header">
-          <h3 class="card-title">📊 Discipline Overrun Summary (Sorted by Delay Impact)</h3>
+          <h3 class="card-title">
+            <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            Discipline Execution Variance Summary
+          </h3>
         </div>
         <div class="card-body history-discipline-grid" id="history-discipline-breakdown">
           <!-- Discipline summary items populated by JS -->
@@ -505,21 +542,26 @@
       <!-- Historical Activities Table -->
       <div class="card">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
-          <h3 class="card-title">📋 Historical Execution Log (Planned vs Actual Duration)</h3>
+          <h3 class="card-title">
+            <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Audited Execution Log (Planned vs Actual Duration &amp; Traceability)
+          </h3>
           <span style="font-size: 0.75rem; color: #64748b;" id="history-record-count">Loading records...</span>
         </div>
         <div class="data-table-container">
           <table class="data-table" id="history-table">
             <thead>
               <tr>
-                <th style="cursor:pointer;" onclick="sortHistoryTable('activity_id')">Activity ID ⬍</th>
+                <th style="cursor:pointer;" onclick="sortHistoryTable('activity_id')">Activity ID &#x2B0D;</th>
                 <th>Description</th>
-                <th style="cursor:pointer;" onclick="sortHistoryTable('discipline')">Discipline ⬍</th>
+                <th style="cursor:pointer;" onclick="sortHistoryTable('discipline')">Discipline &#x2B0D;</th>
                 <th>Planned Window</th>
                 <th>Actual Window</th>
-                <th style="cursor:pointer;" onclick="sortHistoryTable('planned_duration_days')">Planned Duration ⬍</th>
-                <th style="cursor:pointer;" onclick="sortHistoryTable('actual_duration_days')">Actual Duration ⬍</th>
-                <th style="cursor:pointer;" onclick="sortHistoryTable('variance_days')">Variance (Days) ⬍</th>
+                <th style="cursor:pointer;" onclick="sortHistoryTable('planned_duration_days')">Planned &#x2B0D;</th>
+                <th style="cursor:pointer;" onclick="sortHistoryTable('actual_duration_days')">Actual &#x2B0D;</th>
+                <th style="cursor:pointer;" onclick="sortHistoryTable('variance_days')">Variance &#x2B0D;</th>
+                <th>Source Evidence</th>
+                <th>Approved By</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -607,39 +649,54 @@
 
   <!-- Split-Screen Review Inspection Modal -->
   <div class="modal-backdrop" id="review-modal">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width:980px;">
       <div class="modal-header">
-        <h3 class="modal-title">🔍 Planner Review Workstation (Split Inspection)</h3>
-        <button class="btn btn-outline btn-sm" onclick="closeReviewModal()">✕</button>
+        <h3 class="modal-title">
+          <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+          Planner Review Workstation &mdash; Schedule Linking Inspection
+        </h3>
+        <button class="btn btn-outline btn-sm" onclick="closeReviewModal()">&#x2715;</button>
       </div>
       <div class="modal-body">
+        <!-- Schedule Mutation Success Feedback Banner -->
+        <div id="modal-schedule-mutation-banner" style="display:none;" class="schedule-updated-banner"></div>
+
         <div class="workstation-split">
-          <!-- Left Column: Source Evidence -->
+          <!-- Left Column: Source Evidence & Canonical Progress Event -->
           <div>
-            <h4 style="font-size:0.875rem; font-weight:700; color:#0f172a; margin-bottom:0.5rem;">
-              Source Evidence (<span id="modal-doc-name">--</span>)
-            </h4>
-            <div class="evidence-box">
-              <strong>Extracted Evidence Snippet:</strong>
-              <div id="modal-evidence-text" style="font-style:italic; margin-top:0.25rem;">--</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <h4 style="font-size:0.875rem; font-weight:700; color:#0f172a; margin:0;">
+                <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Canonical Progress Event
+              </h4>
+              <span class="badge-tag" id="modal-doc-name">Field DPR</span>
             </div>
-            <h5 style="font-size:0.8rem; font-weight:600; color:#475569; margin-top:1rem; margin-bottom:0.35rem;">Full Document Context:</h5>
-            <div class="dpr-preview-box" id="modal-raw-doc-text" style="max-height:200px;">--</div>
+
+            <!-- Structured Canonical Progress Event Card -->
+            <div id="modal-canonical-card" class="canonical-event-card">
+              <!-- Populated by JS -->
+            </div>
+
+            <div style="margin-top:0.75rem;">
+              <h5 style="font-size:0.78rem; font-weight:700; color:#475569; margin-bottom:0.35rem; text-transform:uppercase; letter-spacing:0.04em;">
+                Original Source Document Context
+              </h5>
+              <div class="dpr-preview-box" id="modal-raw-doc-text" style="max-height:160px;">--</div>
+            </div>
           </div>
 
-          <!-- Right Column: Extracted Metadata & Candidate Activities -->
+          <!-- Right Column: AI Schedule Recommendation & Explainability -->
           <div>
-            <h4 style="font-size:0.875rem; font-weight:700; color:#0f172a; margin-bottom:0.5rem;">
-              Extracted Facts
-            </h4>
-            <div id="modal-extracted-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; font-size:0.8rem; background:#f8fafc; padding:0.75rem; border-radius:6px; border:1px solid #e2e8f0; margin-bottom:1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <h4 style="font-size:0.875rem; font-weight:700; color:#0f172a; margin:0;">
+                <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                AI Schedule Recommendation &amp; Evidence
+              </h4>
+              <span style="font-size:0.725rem; color:#64748b;">Multi-Signal Matching</span>
             </div>
 
-            <h4 style="font-size:0.875rem; font-weight:700; color:#0f172a; margin-bottom:0.5rem;">
-              Top-K Candidate Activities & Multi-Signal Scoring
-            </h4>
             <div id="modal-candidates-list">
-              <!-- Rendered candidates -->
+              <!-- Rendered candidates & Why this match checklist -->
             </div>
           </div>
         </div>
@@ -654,8 +711,11 @@
   <div class="modal-backdrop" id="edit-modal">
     <div class="modal-content" style="max-width:550px;">
       <div class="modal-header">
-        <h3 class="modal-title">✏️ Edit & Planner Override</h3>
-        <button class="btn btn-outline btn-sm" onclick="closeEditModal()">✕</button>
+        <h3 class="modal-title">
+          <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Edit &amp; Planner Schedule Override
+        </h3>
+        <button class="btn btn-outline btn-sm" onclick="closeEditModal()">&#x2715;</button>
       </div>
       <div class="modal-body">
         <div style="margin-bottom:1rem;">

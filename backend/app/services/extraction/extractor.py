@@ -58,21 +58,79 @@ class RuleBasedFallbackExtractor(LLMExtractor):
         metadata = metadata or {}
         doc_date = metadata.get("date")
         
+    METADATA_HEADER_PREFIXES = (
+        "oil india", "project:", "report ref:", "site engineer:", "site security & admin:",
+        "site security and admin:", "area:", "weather:", "shift:", "date:", "daily progress report",
+        "prepared by:", "reviewed by:", "approved by:", "contractor:", "distribution:"
+    )
+
+    SECTION_HEADER_EXACT = {
+        "field activity log:", "daily log:", "site security & admin:", "site security and admin:",
+        "general notes:", "observations:", "summary:", "activity log:", "progress summary:"
+    }
+
+    KNOWN_UNITS = {
+        "spools", "spool", "joints", "joint", "cum", "cu.m", "m3", "m",
+        "units", "unit", "meters", "meter", "panels", "panel", "loops",
+        "loop", "valves", "valve", "pieces", "piece", "tonnes", "tonne",
+        "brackets", "bracket", "supports", "support", "checkpoints", "nos", "no"
+    }
+
+    QUANTITY_STOP_WORDS = {
+        "hours", "days", "shifts", "am", "pm", "today", "yesterday", "completed",
+        "installed", "erected", "started", "done", "near", "at", "in", "the", "with",
+        "of", "and", "for", "to", "by", "on", "from"
+    }
+
+    def _is_header_or_metadata(self, raw_line: str, cleaned_line: str) -> bool:
+        low = cleaned_line.strip().lower()
+        if not low:
+            return True
+
+        # Exact section headers
+        if low in self.SECTION_HEADER_EXACT or low.rstrip(":") in [s.rstrip(":") for s in self.SECTION_HEADER_EXACT]:
+            return True
+
+        # Ends with colon and has no digits/quantities or action indicators (pure header)
+        if low.endswith(":") and not re.search(r"\d", low):
+            return True
+
+        # Starts with any known metadata label
+        if any(low.startswith(prefix) for prefix in self.METADATA_HEADER_PREFIXES):
+            return True
+
+        # Pure label: value metadata pattern (e.g. "Site Engineer: K. Sharma")
+        if re.match(r"^[a-zA-Z\s&]{3,25}:\s*[^:]+$", cleaned_line.strip()):
+            label = cleaned_line.split(":", 1)[0].strip().lower()
+            if label in {"site engineer", "site security & admin", "site security and admin", "project", "report ref", "area", "weather", "shift", "date"}:
+                return True
+
+        return False
+
+    def extract_events(self, text: str, metadata: Optional[Dict[str, Any]] = None) -> List[FieldEventExtract]:
+        metadata = metadata or {}
+        doc_date = metadata.get("date")
+        
         # Try to parse date from document header if present
         date_match = re.search(r"Date:\s*([0-9]{4}-[0-9]{2}-[0-9]{2})", text, re.IGNORECASE)
         if date_match:
             doc_date = date_match.group(1)
+
+        # Base date for relative temporal parsing (deterministic demo date if configured)
+        base_date = doc_date or settings.get_effective_date()
 
         # Split text into candidate activity lines or sentences
         lines = [line.strip() for line in text.splitlines() if line.strip()]
         candidate_lines = []
 
         for line in lines:
-            # Match lines starting with numbers/bullets or action descriptions
-            cleaned = re.sub(r"^\d+[\.\)]\s*", "", line)
-            # Filter out headers and metadata lines
-            if any(cleaned.lower().startswith(h) for h in ["oil india", "project:", "report ref:", "site engineer:", "area:", "daily progress report"]):
+            # Strip leading list markers: 1., 1), -, *, etc.
+            cleaned = re.sub(r"^(\d+[\.\)]|\-|\*)\s*", "", line).strip()
+            
+            # Filter out document metadata and section headers
+            if self._is_header_or_metadata(line, cleaned):
                 continue
+
             if len(cleaned.split()) >= 3:
                 candidate_lines.append((line, cleaned))
 
@@ -81,30 +139,43 @@ class RuleBasedFallbackExtractor(LLMExtractor):
         for original_line, line in candidate_lines:
             # 1. Evidence text is the sentence itself
             evidence = line
+            lower_line = line.lower()
 
             # 2. Check for quantity and unit
-            # Example: "14 spools installed", "4 joints", "45 cum", "100 m"
             qty = None
             unit = None
-            matches = list(re.finditer(r"(?<![A-Za-z0-9\-])(\d+(?:\.\d+)?)\s+([a-zA-Z]+)\b", line))
-            stop_words = {"hours", "days", "shifts", "am", "pm", "today", "yesterday", "completed", "installed", "erected", "started", "done", "near", "at", "in", "the", "with"}
-            known_units = {"spools", "spool", "joints", "joint", "cum", "m", "units", "unit", "meters", "meter", "panels", "panel", "loops", "loop", "valves", "valve", "pieces", "piece", "tonnes", "tonne", "checkpoints"}
-            
-            for m in matches:
-                cand_qty = float(m.group(1))
-                cand_unit = m.group(2).lower()
-                if cand_unit in known_units:
-                    qty = cand_qty
-                    unit = cand_unit
-                    break
-                elif cand_unit not in stop_words and qty is None:
-                    qty = cand_qty
-                    unit = cand_unit
-                    unit = candidate_unit
+
+            # Check for partial pattern: e.g. "14 of 20 supports"
+            part_m = re.search(r"(\d+(?:\.\d+)?)\s+of\s+\d+(?:\.\d+)?\s+([a-zA-Z]+)", line, re.IGNORECASE)
+            if part_m:
+                qty = float(part_m.group(1))
+                unit = part_m.group(2).lower()
+            else:
+                matches = list(re.finditer(r"(?<![A-Za-z0-9\-])(\d+(?:\.\d+)?)\s*([a-zA-Z]+)?\b", line))
+                for m in matches:
+                    cand_qty = float(m.group(1))
+                    raw_cand_unit = m.group(2)
+                    cand_unit = raw_cand_unit.lower() if raw_cand_unit else None
+                    if cand_unit and cand_unit in self.KNOWN_UNITS:
+                        qty = cand_qty
+                        unit = cand_unit
+                        break
+                    else:
+                        # Check if subsequent word is a known unit (e.g. "8 pipe supports")
+                        rest = line[m.end():]
+                        next_m = re.match(r"^\s*([a-zA-Z]+)\b", rest)
+                        if next_m and next_m.group(1).lower() in self.KNOWN_UNITS:
+                            qty = cand_qty
+                            unit = next_m.group(1).lower()
+                            break
+                        elif cand_unit and cand_unit not in self.QUANTITY_STOP_WORDS and qty is None:
+                            qty = cand_qty
+                            unit = cand_unit  # Preserved as text without crashing
+                        elif not cand_unit and qty is None:
+                            qty = cand_qty
 
             # 3. Status determination
             status = "IN_PROGRESS"
-            lower_line = line.lower()
             for st, keywords in self.STATUS_KEYWORDS.items():
                 if any(kw in lower_line for kw in keywords):
                     status = st
@@ -114,9 +185,9 @@ class RuleBasedFallbackExtractor(LLMExtractor):
             discipline = None
             max_disc_matches = 0
             for disc, kw_list in self.DISCIPLINE_KEYWORDS.items():
-                matches = sum(1 for kw in kw_list if kw in lower_line)
-                if matches > max_disc_matches:
-                    max_disc_matches = matches
+                matches_count = sum(1 for kw in kw_list if kw in lower_line)
+                if matches_count > max_disc_matches:
+                    max_disc_matches = matches_count
                     discipline = disc
 
             # 5. Location extraction
@@ -143,10 +214,17 @@ class RuleBasedFallbackExtractor(LLMExtractor):
             elif status == "COMPLETED":
                 progress_pct = 100.0
 
-            # 8. Date resolution
-            event_date = doc_date
-            if "today" in lower_line and doc_date:
-                event_date = doc_date
+            # 8. Deterministic Date resolution
+            from datetime import datetime, timedelta
+            event_date = base_date
+            if "yesterday" in lower_line:
+                try:
+                    dt = datetime.strptime(base_date[:10], "%Y-%m-%d")
+                    event_date = (dt - timedelta(days=1)).strftime("%Y-%m-%d")
+                except Exception:
+                    event_date = base_date
+            elif "today" in lower_line or not event_date:
+                event_date = base_date
 
             # Filter out non-construction noise (like zero incident HSE statements if trivial)
             if "zero safety incidents" in lower_line and not discipline:
@@ -154,7 +232,6 @@ class RuleBasedFallbackExtractor(LLMExtractor):
 
             # Activity description: cleaned representation of the line
             desc = line
-            # Truncate if too long
             if len(desc) > 200:
                 desc = desc[:200]
 
