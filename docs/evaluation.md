@@ -1,6 +1,6 @@
 # InfraNexus AI — Ground-Truth Evaluation Report
 
-**Date:** 2026-09-19 22:54:55
+**Date:** 2026-09-19 23:10:37
 **Problem Statement:** SIH26122 (Oil India Limited)
 **Team:** Infranexus
 **Mode:** Deterministic Offline Fallback (Local Scikit TF-IDF & Deterministic NLP Rules)
@@ -13,7 +13,7 @@
 | Top-3 Candidate Recall | > 90.0% | **100.0%** | ✅ PASSED |
 | Ambiguity Routing Accuracy | > 80.0% | **100.0%** | ✅ PASSED |
 | No-Match Detection Accuracy | > 80.0% | **100.0%** | ✅ PASSED |
-| Pipeline Latency (per event) | < 250 ms | **7.85 ms** | ✅ PASSED |
+| Pipeline Latency (per event) | < 250 ms | **8.77 ms** | ✅ PASSED |
 
 ## 2. Controlled Scenario Verification Matrix
 

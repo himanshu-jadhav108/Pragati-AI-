@@ -351,7 +351,7 @@ FIELD ACTIVITY LOG:
         "event_id": "EVT-AMBIG-002",
         "doc_filename": "DPR-OIL-2026-0218-02.txt",
         "raw_text": "Suction line welding in progress at Pump House PH-1. Completed fit-up and weld for 4 joints today.",
-        "expected_activity_id": "PIP-L6-0501",  # or PIP-L6-0502 (both plausible)
+        "expected_activity_id": "PIP-L6-0501|PIP-L6-0502",
         "expected_confidence": "MEDIUM",
         "expected_discipline": "Piping",
         "expected_location": "Pump House PH-1",
@@ -418,6 +418,36 @@ FIELD ACTIVITY LOG:
         "expected_unit": "pieces",
         "expected_status": "COMPLETED",
         "scenario": "SYNONYM_PHRASING"
+    })
+
+    # No match site activity
+    ground_truth.append({
+        "event_id": "EVT-NOMATCH-005",
+        "doc_filename": "DPR-OIL-2026-0308-01.txt",
+        "raw_text": "Temporary access platform installed beside Tank T-204.",
+        "expected_activity_id": None,
+        "expected_confidence": "UNMATCHED",
+        "expected_discipline": None,
+        "expected_location": "Tank T-204",
+        "expected_quantity": None,
+        "expected_unit": None,
+        "expected_status": "IN_PROGRESS",
+        "scenario": "NO_MATCH"
+    })
+
+    # Time Agent hero case
+    ground_truth.append({
+        "event_id": "EVT-HERO-006",
+        "doc_filename": "TimeAgent",
+        "raw_text": "24-inch spool erected near V-105 today.",
+        "expected_activity_id": "PIP-L6-0427",
+        "expected_confidence": "HIGH",
+        "expected_discipline": "Piping",
+        "expected_location": "V-105",
+        "expected_quantity": None,
+        "expected_unit": None,
+        "expected_status": "COMPLETED",
+        "scenario": "HERO_SUCCESS"
     })
 
     # Save ground truth CSV

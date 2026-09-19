@@ -233,7 +233,8 @@ class MatchingEngine:
         # 4. Contextual size / line attribute
         for attr in ["24-inch", "24\"", "14-inch", "14\"", "18-inch", "12-inch", "suction", "discharge", "booster"]:
             if attr in ev_text_low and (attr in act_desc or (attr == "24\"" and "24-inch" in act_desc)):
-                signals.append(f"✓ {attr.replace('\"', '-inch')} attribute")
+                clean_attr = attr.replace('"', '-inch')
+                signals.append(f"✓ {clean_attr} attribute")
                 break
 
         # 5. Engineering Activity verb
