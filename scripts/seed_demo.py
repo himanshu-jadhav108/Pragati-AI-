@@ -38,7 +38,8 @@ def run_seed(db: Session = None):
         db.query(Project).delete()
         db.commit()
 
-    print("Seeding PRAGATI AI demo database...")
+    print("Seeding InfraNexus AI demo database...")
+
 
     # 1. Seed Project
     project = Project(

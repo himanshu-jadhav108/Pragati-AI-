@@ -1,8 +1,8 @@
-# PRAGATI AI — Acceptance Report & Verification Summary
+# InfraNexus AI — Acceptance Report & Verification Summary
 
 **Date:** 2026-09-08  
 **Team:** InfraNexus  
-**Product:** PRAGATI AI  
+**Product:** InfraNexus AI  
 **Problem Statement:** SIH26122 (Oil India Limited)  
 **Verification Status:** **ALL ACCEPTANCE CRITERIA PASSED (15/15 Tests)**
 

@@ -1,4 +1,4 @@
-# PRAGATI AI — Ground-Truth Evaluation Report
+# InfraNexus AI — Ground-Truth Evaluation Report
 
 **Date:** 2026-09-08 19:02:31
 **Problem Statement:** SIH26122 (Oil India Limited)

@@ -1,4 +1,4 @@
-# PRAGATI AI — Render.com 1-Click Deployment Guide
+# InfraNexus AI — Render.com 1-Click Deployment Guide
 **SIH26122 - Oil India Limited | Team: InfraNexus**
 
 This repository is pre-configured for 100% plug-and-play cloud deployment on [Render.com](https://render.com) (Free Tier).
@@ -8,7 +8,7 @@ This repository is pre-configured for 100% plug-and-play cloud deployment on [Re
 ## 🚀 Quick Deployment (3 Simple Steps)
 
 ### Step 1: Push Code to GitHub
-Open your terminal in `d:\Projects\Pragati AI` and run:
+Open your terminal in `d:\Projects\InfraNexus AI` and run:
 
 ```bash
 # 1. Initialize git (if not already done)
@@ -18,7 +18,7 @@ git init
 git add .
 
 # 3. Create initial commit
-git commit -m "feat: complete PRAGATI AI demo-ready deployment"
+git commit -m "feat: complete InfraNexus AI demo-ready deployment"
 
 # 4. Link to your GitHub repository (replace with your actual GitHub repo URL)
 git branch -M main

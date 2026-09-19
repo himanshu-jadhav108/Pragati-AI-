@@ -32,7 +32,7 @@ except Exception as e:
 
 
 app = FastAPI(
-    title="PRAGATI AI",
+    title="InfraNexus AI",
     description="AI-Powered Planning-to-Execution Intelligence Layer (SIH26122 - Oil India Limited)",
     version="1.0.0"
 )
@@ -54,7 +54,7 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 def health_check():
     return {
         "status": "healthy",
-        "service": "PRAGATI AI Backend",
+        "service": "InfraNexus AI Backend",
         "version": "1.0.0",
         "ai_provider": settings.AI_PROVIDER,
         "database": "sqlite/postgresql",
@@ -71,4 +71,5 @@ def serve_ui():
     index_path = os.path.join(STATIC_DIR, "index.html")
     if os.path.exists(index_path):
         return FileResponse(index_path)
-    return JSONResponse({"message": "PRAGATI AI API is running. Visit /docs for Swagger UI or /api/dashboard/summary."})
+    return JSONResponse({"message": "InfraNexus AI API is running. Visit /docs for Swagger UI or /api/dashboard/summary."})
+

@@ -1,7 +1,7 @@
-# PRAGATI AI — Final MVP Status Report
+# InfraNexus AI — Final MVP Status Report
 
 **Team:** InfraNexus  
-**Project:** PRAGATI AI  
+**Project:** InfraNexus AI  
 **Problem Statement:** SIH26122 (Oil India Limited)  
 
 ---

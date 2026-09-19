@@ -1,7 +1,8 @@
 """
-PRAGATI AI — Startup Runner
+PRAGATI AI / InfraNexus AI — Startup Runner
 Launches the FastAPI backend and serves the enterprise planner UI on http://127.0.0.1:8000
 """
+
 
 import os
 import sys
@@ -37,9 +38,10 @@ if __name__ == "__main__":
     host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", "8000"))
     print("=" * 70)
-    print("  PRAGATI AI — Planning-to-Execution Intelligence Layer")
+    print("  InfraNexus AI — Planning-to-Execution Intelligence Layer")
     print("  SIH26122 - Oil India Limited | Team: InfraNexus")
     print("=" * 70)
+
     print(f"  Local Access:       http://127.0.0.1:{port}")
     print(f"  LAN / Mobile / IP:  http://0.0.0.0:{port}")
     print(f"  API Documentation:  http://127.0.0.1:{port}/docs")

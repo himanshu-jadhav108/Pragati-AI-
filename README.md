@@ -1,4 +1,8 @@
-# PRAGATI AI — Planning-to-Execution Intelligence Layer
+<div align="center">
+  <img src="docs/banner.png" alt="InfraNexus AI Banner" width="100%" style="border-radius: 8px; margin-bottom: 1rem;" />
+</div>
+
+# InfraNexus AI — Planning-to-Execution Intelligence Layer
 
 **Smart India Hackathon 2026** | **Problem Statement:** SIH26122  
 **Organization:** Oil India Limited  
@@ -8,9 +12,10 @@
 
 ## Overview
 
-**PRAGATI AI** is an AI-assisted translation and governance layer that bridges unstructured daily field reports (DPRs, site diaries, spreadsheets, PDFs) to detailed L5/L6 project schedules. 
+**InfraNexus AI** is an AI-assisted translation and governance layer that bridges unstructured daily field reports (DPRs, site diaries, spreadsheets, PDFs) to detailed L5/L6 project schedules. 
 
-Planners manually spend hours reconciling fragmented field logs against hundreds of work breakdown activities. PRAGATI AI automates this matching through multi-signal semantic and contextual intelligence while enforcing **strict human planner governance**: AI proposes; the human planner approves, edits, or rejects. No schedule mutation ever occurs silently.
+Planners manually spend hours reconciling fragmented field logs against hundreds of work breakdown activities. InfraNexus AI automates this matching through multi-signal semantic and contextual intelligence while enforcing **strict human planner governance**: AI proposes; the human planner approves, edits, or rejects. No schedule mutation ever occurs silently.
+
 
 ```mermaid
 flowchart LR

@@ -1,7 +1,7 @@
-# PRAGATI AI — 3 to 5 Minute SIH Judge Demo Script
+# InfraNexus AI — 3 to 5 Minute SIH Judge Demo Script
 
 **Team:** InfraNexus  
-**Project:** PRAGATI AI  
+**Project:** InfraNexus AI  
 **Problem Statement:** SIH26122 (Oil India Limited)  
 **URL:** [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
@@ -18,7 +18,7 @@ Open browser to `http://127.0.0.1:8000`.
 
 ## 1. Executive Dashboard (0:00 - 0:45)
 - **What to say:**
-  > *"PRAGATI AI is the intelligence and governance bridge between unstructured daily field execution reports (DPRs) and detailed L5/L6 project schedules for Oil India's infrastructure projects. Planners traditionally spend hours manually mapping fragmented field text to hundreds of WBS codes. Our system automates this translation while enforcing human planner control."*
+  > *"InfraNexus AI is the intelligence and governance bridge between unstructured daily field execution reports (DPRs) and detailed L5/L6 project schedules for Oil India's infrastructure projects. Planners traditionally spend hours manually mapping fragmented field text to hundreds of WBS codes. Our system automates this translation while enforcing human planner control."*
 - **What to show on screen:**
   - **Planned vs Actual Progress:** Show the current planned progress (68.5%) vs actual progress (54.2%) and negative schedule variance (-14.3%).
   - **S-Curve Chart:** Point to the real-time S-curve comparing approved baseline vs actual progress.

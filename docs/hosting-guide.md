@@ -1,7 +1,7 @@
-# PRAGATI AI — Hosting & Live Judge Access Guide
+# InfraNexus AI — Hosting & Live Judge Access Guide
 
 **Team:** InfraNexus  
-**Project:** PRAGATI AI  
+**Project:** InfraNexus AI  
 **Problem Statement:** SIH26122 (Oil India Limited)  
 
 ---
@@ -60,7 +60,7 @@ npx localtunnel --port 8000
 1. **Push your code to GitHub:**
    ```powershell
    git add .
-   git commit -m "Deploy PRAGATI AI demo prototype"
+   git commit -m "Deploy InfraNexus AI demo prototype"
    git push origin main
    ```
 

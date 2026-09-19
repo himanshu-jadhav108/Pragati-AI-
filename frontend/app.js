@@ -1,5 +1,5 @@
 /**
- * PRAGATI AI - Enterprise Planner Workstation Frontend Logic
+ * InfraNexus AI - Enterprise Planner Workstation Frontend Logic
  * SIH26122 - Oil India Limited
  */
 
@@ -436,7 +436,7 @@ async function runExtractionForCurrentDoc() {
   }
 
   try {
-    showToast('Extracting structured events via PRAGATI AI pipeline...', 'info');
+    showToast('Extracting structured events via InfraNexus AI pipeline...', 'info');
     const res = await fetch(`/api/extractions/${state.currentUploadedDocId}/run`, {
       method: 'POST'
     });
@@ -690,7 +690,7 @@ async function loadSystemHealth() {
 }
 
 async function triggerDemoReset() {
-  if (!confirm('Reset entire PRAGATI AI database to clean baseline demo state?')) return;
+  if (!confirm('Reset entire InfraNexus AI database to clean baseline demo state?')) return;
   try {
     showToast('Resetting demo environment...', 'info');
     const res = await fetch('/api/demo/reset', { method: 'POST' });

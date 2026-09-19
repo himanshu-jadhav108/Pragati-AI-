@@ -193,8 +193,9 @@ class HostedLLMExtractor(LLMExtractor):
             # Gemini Extraction Pipeline
             if settings.GEMINI_API_KEY:
                 prompt = (
-                    "You are PRAGATI AI extraction assistant for construction and pipeline engineering.\n"
+                    "You are InfraNexus AI extraction assistant for construction and pipeline engineering.\n"
                     "Extract progress events from the text into a JSON array.\n"
+
                     "Only extract facts explicitly stated in the text. Do not invent or guess WBS codes.\n"
                     f"Report Text:\n{text}\n\n"
                     "Return ONLY a valid JSON array of objects formatted exactly like this:\n"
@@ -262,8 +263,9 @@ class HostedLLMExtractor(LLMExtractor):
                                             evidence_text=item.get("evidence_text") or text[:150]
                                         ))
                                     if extracted:
-                                        print(f"INFO: PRAGATI AI successfully extracted {len(extracted)} events using live Gemini ({model})")
+                                        print(f"INFO: InfraNexus AI successfully extracted {len(extracted)} events using live Gemini ({model})")
                                         return extracted
+
                     except Exception as me:
                         print(f"INFO: Gemini model {model} attempt: {me}")
                         continue

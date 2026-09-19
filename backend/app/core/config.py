@@ -22,8 +22,9 @@ if os.path.exists(env_file):
 
 
 class Settings:
-    PROJECT_NAME: str = "PRAGATI AI"
+    PROJECT_NAME: str = "InfraNexus AI"
     API_V1_STR: str = "/api"
+
     raw_db = os.getenv("DATABASE_URL", f"sqlite:///{os.path.join(ROOT_DIR, 'pragati_ai.db')}")
     if raw_db.startswith("postgres://"):
         raw_db = raw_db.replace("postgres://", "postgresql://", 1)
