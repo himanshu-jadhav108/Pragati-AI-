@@ -702,6 +702,11 @@ async function triggerDemoReset() {
     const res = await fetch('/api/demo/reset', { method: 'POST' });
     if (!res.ok) throw new Error('Reset failed');
     showToast('Demo environment reset successfully to clean initial state!', 'success');
+    clearTimeAgentChat();
+    const filterEl = document.getElementById('history-discipline-filter');
+    if (filterEl) filterEl.value = '';
+    state.historySortCol = 'variance_days';
+    state.historySortAsc = false;
     await loadAllData();
     switchTab('overview');
   } catch (err) {

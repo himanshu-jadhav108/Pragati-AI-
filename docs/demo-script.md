@@ -46,7 +46,22 @@ Open browser to `http://127.0.0.1:8000`.
 
 ---
 
-## 3. Human Governance & Multi-Signal Workstation (2:00 - 3:15)
+## 2.5. Time Agent: Conversational Field Logging (2:00 - 2:30)
+- **What to say:**
+  > *"Site supervisors in remote pipeline trenches often don't have the time to draft formal DPR documents. We built Time Agent — a conversational mobile-friendly logging interface that lets supervisors speak or type field progress naturally."*
+- **Action:**
+  1. Click **"💬 Time Agent"** tab.
+  2. Click the quick-reply demo button: **"Foundation concrete at PH-2"** (or type: *"Foundation concrete poured at Pump House PH-2"*).
+  3. **Show what happens:**
+     - AI parses engineering facts: Discipline (`Civil`), Location (`Pump House PH-2`), Status (`IN_PROGRESS`).
+     - Matches against baseline schedule with confidence tier and score badge.
+     - Instant confirmation message: *"Logged: Foundation concrete poured at Pump House PH-2 - matched to CIV-L6-1060 (MEDIUM confidence)."*
+     - Click **"Inspect in Queue &rarr;"** — proves the quick log entered the exact same human-in-the-loop review workflow!
+  4. *(Optional Judge Wow Beat)*: Click **"Catering delivery at gate"** — show how Time Agent safely rejects false matches and prompts the supervisor for clarification (*"Which line or equipment ID is this near?"*).
+
+---
+
+## 3. Human Governance & Multi-Signal Workstation (2:30 - 3:30)
 - **Action:**
   1. In the Review Queue, see the new event with **HIGH Confidence** and score ~74.5%.
   2. Click **"Inspect"** to open the **Split-Screen Planner Workstation**.
@@ -70,7 +85,7 @@ Open browser to `http://127.0.0.1:8000`.
 
 ---
 
-## 4. Ambiguous & Unmatched Edge Cases (3:15 - 4:15)
+## 4. Ambiguous & Unmatched Edge Cases (3:30 - 4:15)
 - **Show Ambiguous Case:**
   - In Review Queue, filter by **"Medium (Review)"**.
   - Open inspection on *"Suction line welding in progress at Pump House PH-1..."*
@@ -85,14 +100,22 @@ Open browser to `http://127.0.0.1:8000`.
 
 ---
 
-## 5. Audit Trail & Verification (4:15 - 5:00)
-- **Action:**
+## 5. Audit Trail & Institutional Memory (4:15 - 5:00)
+- **Audit Trail Beat (4:15 - 4:40):**
   1. Click **"📜 Governance Audit Trail"** tab.
   2. Point to the complete, immutable audit record showing:
      - Event ID & Source Document
      - AI Top Suggestion & Score
      - Planner Action (`APPROVE` or `EDIT_APPROVE`)
      - State Diff: `0% -> 100%`
-     - Decided By: Chief Planner
-     - Timestamp
-  3. Click **"📊 Executive Dashboard"** to show updated actual progress and variance.
+     - Decided By: Chief Planner & Timestamp
+- **Institutional Memory Beat (4:40 - 5:00):**
+  1. Click **"📚 Institutional Memory"** tab.
+  2. **What to say:**
+     > *"Every approved update builds Oil India's Institutional Memory — a growing, queryable history of what actually happened, eliminating repetitive schedule optimism for future capital projects."*
+  3. **What to show on screen:**
+     - **Summary Cards:** 56 completed baseline activities analyzed, total overrun count vs on-time, and average schedule variance.
+     - **Discipline Delay Impact Cards:** Automatically sorted by the disciplines experiencing the greatest cumulative delay impact.
+     - **Execution Log Table:** Planned vs actual durations and color-coded variance (green for on-time/ahead, red for overrun).
+     - Filter by discipline (e.g. `Piping` or `Civil`) to demonstrate instant historical benchmarking for future project baselining.
+  4. (Optional) Show **"Demo Reset"** in **⚙️ System Health** tab to reset the entire database to baseline state in one click.
