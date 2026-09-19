@@ -440,7 +440,7 @@ function renderReviewModal(data) {
       <!-- Why This Match Checklist -->
       <div class="why-matched-container">
         <div class="why-matched-title">
-          <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <svg class="icon-inline" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
           Why This Match? Supporting Evidence
         </div>
         <div class="why-matched-list">
@@ -537,7 +537,7 @@ function renderReviewModal(data) {
       <button class="btn btn-danger" onclick="rejectActiveMatch()">Reject Match</button>
       <button class="btn btn-outline" onclick="openEditModal()">Edit & Override</button>
       <button class="btn btn-success" onclick="approveActiveMatch('${data.match_id}')">
-        <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg class="icon-inline" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
         Approve Schedule Update
       </button>
     `;
@@ -684,7 +684,7 @@ async function approveActiveMatch(matchId) {
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div>
             <strong style="font-size:0.875rem; color:#047857;">
-              <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg class="icon-inline" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
               SCHEDULE COMMITTED &amp; AUDITED
             </strong>
             <div style="font-size:0.8rem; margin-top:0.25rem;">
@@ -1005,7 +1005,7 @@ async function sendTimeAgentMessage() {
     botMsgEl.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
         <div style="display:flex; align-items:center; gap:0.4rem;">
-          <svg class="icon-inline" style="color:var(--primary-blue);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg>
+          <svg class="icon-inline" width="14" height="14" style="color:var(--primary-blue);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg>
           <strong style="font-size:0.825rem; color:#0f172a;">Time Agent</strong>
         </div>
         <div style="display:flex; align-items:center; gap:0.4rem;">
@@ -1036,7 +1036,7 @@ async function sendTimeAgentMessage() {
       ${whyMatchedList.length > 0 ? `
         <div class="why-matched-container" style="margin-bottom:0.75rem;">
           <div class="why-matched-title">
-            <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg class="icon-inline" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
             Why This Match? Supporting Evidence
           </div>
           <div class="why-matched-list">
