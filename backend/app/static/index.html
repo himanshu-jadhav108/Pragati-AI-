@@ -35,7 +35,7 @@
           <span class="provider-pill-text">System: Operational</span>
         </div>
         <button class="btn btn-outline btn-sm reset-btn" onclick="triggerDemoReset()">
-          🔄 Reset Demo
+          🔄 Reset<span class="hide-on-mobile"> Demo</span>
         </button>
       </div>
     </div>
@@ -100,7 +100,7 @@
             <span class="metric-icon">📅</span>
           </div>
           <div class="metric-val" id="metric-planned">--%</div>
-          <div class="metric-sub">Approved baseline curve</div>
+          <div class="metric-sub">Primavera P6 Baseline</div>
         </div>
         <div class="metric-card">
           <div class="metric-header">
@@ -108,15 +108,15 @@
             <span class="metric-icon">🏗️</span>
           </div>
           <div class="metric-val" id="metric-actual">--%</div>
-          <div class="metric-sub">Audited & committed</div>
+          <div class="metric-sub">Audited & Approved Updates</div>
         </div>
         <div class="metric-card">
           <div class="metric-header">
             <span class="metric-label">Schedule Variance</span>
-            <span class="metric-icon">⚖️</span>
+            <span class="metric-icon">⚡</span>
           </div>
           <div class="metric-val" id="metric-variance">--%</div>
-          <div class="metric-sub">Actual vs Planned gap</div>
+          <div class="metric-sub">Deviation from P6 schedule</div>
         </div>
         <div class="metric-card">
           <div class="metric-header">
@@ -188,7 +188,7 @@
 
             <div style="margin-bottom:1.25rem;">
               <div style="display:flex; justify-content:space-between; font-size:0.825rem; margin-bottom:0.35rem;">
-                <span>Not Started</span>
+                <span>Not Started Tasks</span>
                 <strong id="breakdown-not-started">--</strong>
               </div>
               <div class="progress-bar-wrap">
@@ -196,7 +196,7 @@
               </div>
             </div>
 
-            <div style="background:#f8fafc; border-radius:6px; padding:0.75rem; font-size:0.75rem; color:#475569; margin-top:1rem;">
+            <div style="margin-top:1.5rem; padding:0.75rem; background:#f0fdf4; border-left:4px solid #10b981; border-radius:4px; font-size:0.775rem; color:#065f46;">
               💡 <strong>Human Governance Rule:</strong> AI matches never mutate the schedule automatically. All progress updates require explicit planner validation.
             </div>
           </div>
@@ -229,7 +229,7 @@
             </p>
 
             <!-- File Upload Input -->
-            <div style="border:2px dashed #cbd5e1; border-radius:10px; padding:2rem; text-align:center; background:#f8fafc; margin-bottom:1.25rem;">
+            <div style="border:2px dashed #cbd5e1; border-radius:10px; padding:2rem; text-align:center; background:#f8fafc; margin-bottom:1.25rem;" class="upload-dropzone">
               <input type="file" id="file-upload-input" accept=".txt,.pdf,.csv,.dpr" style="display:none;">
               <button class="btn btn-primary" onclick="document.getElementById('file-upload-input').click()">
                 Select Document (.txt, .pdf, .csv)
@@ -242,7 +242,7 @@
               <h4 style="font-size:0.85rem; font-weight:700; margin-bottom:0.6rem; color:#0f172a;">
                 ⚡ Quick Demo Scenarios (One-Click)
               </h4>
-              <div style="display:flex; flex-direction:column; gap:0.5rem;">
+              <div style="display:flex; flex-direction:column; gap:0.5rem;" class="demo-scenarios-list">
                 <button class="btn btn-outline" style="justify-content:flex-start;" onclick="loadDemoScenario('hero')">
                   🌟 <strong>Hero Case:</strong> Spool erection near V-105 (14 spools) &rarr; Expected HIGH Match
                 </button>
@@ -278,8 +278,8 @@
 
     <!-- 2.5. TAB: TIME AGENT (CONVERSATIONAL LOGGING) -->
     <section id="tab-timeagent" class="tab-view">
-      <div class="card" style="max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; height: calc(100vh - 210px); min-height: 560px;">
-        <div class="card-header" style="background: #ffffff; border-bottom: 1px solid var(--border-subtle);">
+      <div class="card timeagent-card">
+        <div class="card-header timeagent-header" style="background: #ffffff; border-bottom: 1px solid var(--border-subtle);">
           <div>
             <h3 class="card-title">💬 Time Agent — Field Supervisor Conversational Logger</h3>
             <p style="font-size: 0.775rem; color: #64748b; margin-top: 0.2rem;">
@@ -287,13 +287,13 @@
             </p>
           </div>
           <div style="display:flex; align-items:center; gap:0.5rem;">
-            <span class="badge badge-high">● Agent Active</span>
+            <span class="badge badge-high hide-on-mobile">● Agent Active</span>
             <button class="btn btn-outline btn-sm" onclick="clearTimeAgentChat()">Clear Chat</button>
           </div>
         </div>
 
         <!-- Chat messages container (scrollable) -->
-        <div class="card-body" id="chat-messages-container" style="flex: 1; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; background: #f8fafc;">
+        <div class="card-body chat-messages-box" id="chat-messages-container" style="flex: 1; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; background: #f8fafc;">
           <!-- Initial Welcome Message from System -->
           <div class="chat-msg chat-system" style="align-self: flex-start; max-width: 82%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px 12px 12px 2px; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
             <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem;">
@@ -308,27 +308,27 @@
         </div>
 
         <!-- Quick reply suggestion buttons -->
-        <div style="padding: 0.65rem 1.25rem; background: #ffffff; border-top: 1px solid #e2e8f0; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
-          <span style="font-size: 0.75rem; font-weight: 600; color: #64748b;">⚡ Quick Demos:</span>
-          <button class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;" onclick="sendQuickReply('Spool erection near V-105 completed today. 14 spools installed.')">
+        <div class="timeagent-quick-replies">
+          <span style="font-size: 0.75rem; font-weight: 600; color: #64748b; flex-shrink: 0;">⚡ Quick Demos:</span>
+          <button class="btn btn-outline btn-sm" onclick="sendQuickReply('Spool erection near V-105 completed today. 14 spools installed.')">
             Spool erected near V-105
           </button>
-          <button class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;" onclick="sendQuickReply('Foundation concrete poured at Pump House PH-2. 45 cum completed.')">
+          <button class="btn btn-outline btn-sm" onclick="sendQuickReply('Foundation concrete poured at Pump House PH-2. 45 cum completed.')">
             Foundation concrete at PH-2
           </button>
-          <button class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;" onclick="sendQuickReply('Suction line welding ongoing at Pump House PH-1. 6 joints welded.')">
+          <button class="btn btn-outline btn-sm" onclick="sendQuickReply('Suction line welding ongoing at Pump House PH-1. 6 joints welded.')">
             Suction line welding at PH-1
           </button>
-          <button class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;" onclick="sendQuickReply('Catering lunch delivery van arrived at security gate 3.')">
+          <button class="btn btn-outline btn-sm" onclick="sendQuickReply('Catering lunch delivery van arrived at security gate 3.')">
             Catering delivery at gate
           </button>
         </div>
 
         <!-- Chat Input Bar -->
-        <div style="padding: 0.85rem 1.25rem; background: #ffffff; border-top: 1px solid #e2e8f0; display: flex; gap: 0.75rem;">
-          <input type="text" id="time-agent-input" placeholder="Type field update (e.g. 'Completed 100m cable trench excavation near Control Room CR-1')..." style="flex: 1; padding: 0.65rem 1rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.85rem; outline: none;" onkeydown="if(event.key === 'Enter') sendTimeAgentMessage()">
-          <button class="btn btn-primary" id="time-agent-send-btn" onclick="sendTimeAgentMessage()" style="padding: 0.65rem 1.25rem;">
-            <span>Send Update</span> <span>➤</span>
+        <div class="timeagent-input-bar">
+          <input type="text" id="time-agent-input" placeholder="Type field update (e.g. 'Completed 100m cable trench excavation near Control Room CR-1')..." onkeydown="if(event.key === 'Enter') sendTimeAgentMessage()">
+          <button class="btn btn-primary" id="time-agent-send-btn" onclick="sendTimeAgentMessage()">
+            <span class="hide-on-mobile">Send Update </span><span>➤</span>
           </button>
         </div>
       </div>
@@ -340,7 +340,7 @@
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">⚖️ Human-in-the-Loop Review Queue</h3>
-          <div style="display:flex; gap:0.5rem;">
+          <div class="chip-filter-row">
             <button class="btn btn-outline btn-sm" onclick="loadReviewQueue()">All</button>
             <button class="btn btn-outline btn-sm" onclick="loadReviewQueue('HIGH')">High Confidence</button>
             <button class="btn btn-outline btn-sm" onclick="loadReviewQueue('MEDIUM')">Medium (Review)</button>
@@ -373,7 +373,7 @@
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">📋 L5/L6 Schedule Activity Master</h3>
-          <div style="display:flex; gap:0.5rem;">
+          <div class="chip-filter-row">
             <button class="btn btn-outline btn-sm" onclick="loadActivities()">All Disciplines</button>
             <button class="btn btn-outline btn-sm" onclick="loadActivities('Piping')">Piping</button>
             <button class="btn btn-outline btn-sm" onclick="loadActivities('Civil')">Civil</button>
@@ -395,18 +395,19 @@
               </tr>
             </thead>
             <tbody id="activities-table-body">
-              <tr><td colspan="7" style="text-align:center; padding:2rem;">Loading activities...</td></tr>
+              <tr><td colspan="7" style="text-align:center; padding:2rem;">Loading schedule activities...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- 5. TAB: AUDIT TRAIL -->
+    <!-- 5. TAB: GOVERNANCE AUDIT TRAIL -->
     <section id="tab-audit" class="tab-view">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">📜 Immutable Governance & Decision Audit Trail</h3>
+          <h3 class="card-title">📜 Immutable Governance Audit Trail</h3>
+          <button class="btn btn-outline btn-sm" onclick="loadAuditTrail()">🔄 Refresh Trail</button>
         </div>
         <div class="data-table-container">
           <table class="data-table">
@@ -414,15 +415,15 @@
               <tr>
                 <th>Timestamp</th>
                 <th>Action</th>
-                <th>Committed Activity</th>
+                <th>Final Activity ID</th>
                 <th>AI Recommendation</th>
-                <th>Progress State Change</th>
-                <th>Decided By</th>
-                <th>Notes / Audit Trace</th>
+                <th>State Delta</th>
+                <th>Planner (Actor)</th>
+                <th>Audit Notes</th>
               </tr>
             </thead>
             <tbody id="audit-trail-body">
-              <tr><td colspan="7" style="text-align:center; padding:2rem;">Loading audit logs...</td></tr>
+              <tr><td colspan="7" style="text-align:center; padding:2rem;">Loading audit trail...</td></tr>
             </tbody>
           </table>
         </div>
@@ -432,7 +433,7 @@
     <!-- 5.5. TAB: INSTITUTIONAL MEMORY -->
     <section id="tab-history" class="tab-view">
       <!-- Explainer Header -->
-      <div style="margin-bottom: 1.5rem; background: #ffffff; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; box-shadow: var(--shadow-sm);">
+      <div class="history-header-card">
         <div>
           <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">
             📚 Institutional Memory — Historical Schedule Execution Analytics
@@ -441,8 +442,8 @@
             Every approved update feeds this record — a growing, queryable history of what actually happened, for future project planning.
           </p>
         </div>
-        <div style="display:flex; align-items:center; gap:0.75rem;">
-          <label style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">Filter Discipline:</label>
+        <div class="history-filter-wrap" style="display:flex; align-items:center; gap:0.75rem;">
+          <label style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); white-space:nowrap;">Filter Discipline:</label>
           <select id="history-discipline-filter" onchange="filterHistoryByDiscipline(this.value)" style="padding:0.45rem 0.75rem; border-radius:var(--radius-sm); border:1px solid #cbd5e1; font-size:0.825rem;">
             <option value="">All Disciplines</option>
             <option value="Civil">Civil</option>
@@ -496,14 +497,14 @@
         <div class="card-header">
           <h3 class="card-title">📊 Discipline Overrun Summary (Sorted by Delay Impact)</h3>
         </div>
-        <div class="card-body" id="history-discipline-breakdown" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+        <div class="card-body history-discipline-grid" id="history-discipline-breakdown">
           <!-- Discipline summary items populated by JS -->
         </div>
       </div>
 
       <!-- Historical Activities Table -->
       <div class="card">
-        <div class="card-header">
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
           <h3 class="card-title">📋 Historical Execution Log (Planned vs Actual Duration)</h3>
           <span style="font-size: 0.75rem; color: #64748b;" id="history-record-count">Loading records...</span>
         </div>
