@@ -50,6 +50,9 @@
       <button class="nav-tab" data-tab="ingestion">
         📥 Field DPR Ingestion
       </button>
+      <button class="nav-tab" data-tab="timeagent">
+        💬 Time Agent
+      </button>
       <button class="nav-tab" data-tab="review">
         ⚖️ Planner Review Queue <span class="tab-badge" id="queue-count-badge">0</span>
       </button>
@@ -59,9 +62,13 @@
       <button class="nav-tab" data-tab="audit">
         📜 Governance Audit Trail
       </button>
+      <button class="nav-tab" data-tab="history">
+        📚 Institutional Memory
+      </button>
       <button class="nav-tab" data-tab="system">
         ⚙️ System Health & Info
       </button>
+
     </div>
   </nav>
 
@@ -269,8 +276,67 @@
       </div>
     </section>
 
+    <!-- 2.5. TAB: TIME AGENT (CONVERSATIONAL LOGGING) -->
+    <section id="tab-timeagent" class="tab-view">
+      <div class="card" style="max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; height: calc(100vh - 210px); min-height: 560px;">
+        <div class="card-header" style="background: #ffffff; border-bottom: 1px solid var(--border-subtle);">
+          <div>
+            <h3 class="card-title">💬 Time Agent — Field Supervisor Conversational Logger</h3>
+            <p style="font-size: 0.775rem; color: #64748b; margin-top: 0.2rem;">
+              Alternative to document upload: Speak or type site updates naturally. AI extracts facts and queues matches for planner approval.
+            </p>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <span class="badge badge-high">● Agent Active</span>
+            <button class="btn btn-outline btn-sm" onclick="clearTimeAgentChat()">Clear Chat</button>
+          </div>
+        </div>
+
+        <!-- Chat messages container (scrollable) -->
+        <div class="card-body" id="chat-messages-container" style="flex: 1; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; background: #f8fafc;">
+          <!-- Initial Welcome Message from System -->
+          <div class="chat-msg chat-system" style="align-self: flex-start; max-width: 82%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px 12px 12px 2px; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem;">
+              <span style="font-size:1.1rem;">🤖</span>
+              <strong style="font-size:0.825rem; color:#0f172a;">Time Agent (InfraNexus AI)</strong>
+              <span style="font-size:0.7rem; color:#94a3b8;">System Ready</span>
+            </div>
+            <p style="font-size:0.85rem; color:#334155; margin:0; line-height:1.45;">
+              Hello Site Supervisor! Log today's field progress directly in natural text. I will extract structured engineering attributes, match against the baseline schedule, and route to the Planner Review Queue.
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick reply suggestion buttons -->
+        <div style="padding: 0.65rem 1.25rem; background: #ffffff; border-top: 1px solid #e2e8f0; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+          <span style="font-size: 0.75rem; font-weight: 600; color: #64748b;">⚡ Quick Demos:</span>
+          <button class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;" onclick="sendQuickReply('Spool erection near V-105 completed today. 14 spools installed.')">
+            Spool erected near V-105
+          </button>
+          <button class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;" onclick="sendQuickReply('Foundation concrete poured at Pump House PH-2. 45 cum completed.')">
+            Foundation concrete at PH-2
+          </button>
+          <button class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;" onclick="sendQuickReply('Suction line welding ongoing at Pump House PH-1. 6 joints welded.')">
+            Suction line welding at PH-1
+          </button>
+          <button class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;" onclick="sendQuickReply('Catering lunch delivery van arrived at security gate 3.')">
+            Catering delivery at gate
+          </button>
+        </div>
+
+        <!-- Chat Input Bar -->
+        <div style="padding: 0.85rem 1.25rem; background: #ffffff; border-top: 1px solid #e2e8f0; display: flex; gap: 0.75rem;">
+          <input type="text" id="time-agent-input" placeholder="Type field update (e.g. 'Completed 100m cable trench excavation near Control Room CR-1')..." style="flex: 1; padding: 0.65rem 1rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.85rem; outline: none;" onkeydown="if(event.key === 'Enter') sendTimeAgentMessage()">
+          <button class="btn btn-primary" id="time-agent-send-btn" onclick="sendTimeAgentMessage()" style="padding: 0.65rem 1.25rem;">
+            <span>Send Update</span> <span>➤</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
     <!-- 3. TAB: PLANNER REVIEW QUEUE -->
     <section id="tab-review" class="tab-view">
+
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">⚖️ Human-in-the-Loop Review Queue</h3>
@@ -363,8 +429,110 @@
       </div>
     </section>
 
+    <!-- 5.5. TAB: INSTITUTIONAL MEMORY -->
+    <section id="tab-history" class="tab-view">
+      <!-- Explainer Header -->
+      <div style="margin-bottom: 1.5rem; background: #ffffff; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; box-shadow: var(--shadow-sm);">
+        <div>
+          <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">
+            📚 Institutional Memory — Historical Schedule Execution Analytics
+          </h2>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">
+            Every approved update feeds this record — a growing, queryable history of what actually happened, for future project planning.
+          </p>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <label style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">Filter Discipline:</label>
+          <select id="history-discipline-filter" onchange="filterHistoryByDiscipline(this.value)" style="padding:0.45rem 0.75rem; border-radius:var(--radius-sm); border:1px solid #cbd5e1; font-size:0.825rem;">
+            <option value="">All Disciplines</option>
+            <option value="Civil">Civil</option>
+            <option value="Piping">Piping</option>
+            <option value="Mechanical">Mechanical</option>
+            <option value="Electrical">Electrical</option>
+            <option value="Instrumentation">Instrumentation</option>
+            <option value="HSE">HSE</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- High Level Metric Summary Cards -->
+      <div class="metrics-grid" id="history-summary-cards" style="margin-bottom: 1.5rem;">
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Completed Activities</span>
+            <span class="metric-icon">🏁</span>
+          </div>
+          <div class="metric-val" id="hist-metric-completed">--</div>
+          <div class="metric-sub">Historical verified records</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Overrun Activities</span>
+            <span class="metric-icon">⚠️</span>
+          </div>
+          <div class="metric-val" id="hist-metric-overruns" style="color:var(--danger);">--</div>
+          <div class="metric-sub">Exceeded planned duration</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">On-Time / Ahead</span>
+            <span class="metric-icon">✅</span>
+          </div>
+          <div class="metric-val" id="hist-metric-ontime" style="color:var(--success);">--</div>
+          <div class="metric-sub">Met or beat planned schedule</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Avg Schedule Variance</span>
+            <span class="metric-icon">⏱️</span>
+          </div>
+          <div class="metric-val" id="hist-metric-avg-var">-- d</div>
+          <div class="metric-sub">Project-wide duration deviation</div>
+        </div>
+      </div>
+
+      <!-- Discipline Overrun Breakdown Cards -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <h3 class="card-title">📊 Discipline Overrun Summary (Sorted by Delay Impact)</h3>
+        </div>
+        <div class="card-body" id="history-discipline-breakdown" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+          <!-- Discipline summary items populated by JS -->
+        </div>
+      </div>
+
+      <!-- Historical Activities Table -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">📋 Historical Execution Log (Planned vs Actual Duration)</h3>
+          <span style="font-size: 0.75rem; color: #64748b;" id="history-record-count">Loading records...</span>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table" id="history-table">
+            <thead>
+              <tr>
+                <th style="cursor:pointer;" onclick="sortHistoryTable('activity_id')">Activity ID ⬍</th>
+                <th>Description</th>
+                <th style="cursor:pointer;" onclick="sortHistoryTable('discipline')">Discipline ⬍</th>
+                <th>Planned Window</th>
+                <th>Actual Window</th>
+                <th style="cursor:pointer;" onclick="sortHistoryTable('planned_duration_days')">Planned Duration ⬍</th>
+                <th style="cursor:pointer;" onclick="sortHistoryTable('actual_duration_days')">Actual Duration ⬍</th>
+                <th style="cursor:pointer;" onclick="sortHistoryTable('variance_days')">Variance (Days) ⬍</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body">
+              <tr><td colspan="9" style="text-align:center; padding:2rem;">Loading historical records...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <!-- 6. TAB: SYSTEM HEALTH & DEMO INFO -->
     <section id="tab-system" class="tab-view">
+
       <div class="grid-2col">
         <div class="card">
           <div class="card-header">

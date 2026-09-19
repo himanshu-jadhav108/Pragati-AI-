@@ -46,8 +46,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API Router
+# Include API Router (supports both /api and /api/v1)
 app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(api_router, prefix="/api/v1")
+
 
 # System Health Check
 @app.get("/health")

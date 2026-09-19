@@ -12,7 +12,10 @@ const state = {
   auditLogs: [],
   activeMatchDetail: null,
   currentUploadedDocId: null,
-  systemHealth: null
+  systemHealth: null,
+  historicalInsights: null,
+  historySortCol: 'variance_days',
+  historySortAsc: false
 };
 
 // DOM Content Loaded
@@ -43,8 +46,10 @@ function switchTab(tabId) {
   });
 
   if (tabId === 'overview') loadDashboardSummary();
+  if (tabId === 'timeagent') focusTimeAgent();
   if (tabId === 'review') loadReviewQueue();
   if (tabId === 'activities') loadActivities();
+  if (tabId === 'history') loadHistoricalInsights();
   if (tabId === 'audit') loadAuditTrail();
   if (tabId === 'system') loadSystemHealth();
 }
@@ -54,7 +59,8 @@ async function loadAllData() {
   await Promise.all([
     loadDashboardSummary(),
     loadReviewQueue(),
-    loadSystemHealth()
+    loadSystemHealth(),
+    loadHistoricalInsights()
   ]);
 }
 
@@ -700,6 +706,322 @@ async function triggerDemoReset() {
     switchTab('overview');
   } catch (err) {
     showToast('Reset failed: ' + err.message, 'error');
+  }
+}
+
+// 4.5. Time Agent (Conversational Logging)
+function focusTimeAgent() {
+  setTimeout(() => {
+    const input = document.getElementById('time-agent-input');
+    if (input) input.focus();
+  }, 50);
+}
+
+function clearTimeAgentChat() {
+  const container = document.getElementById('chat-messages-container');
+  if (!container) return;
+  container.innerHTML = `
+    <div class="chat-msg chat-system" style="align-self: flex-start; max-width: 82%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px 12px 12px 2px; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem;">
+        <span style="font-size:1.1rem;">🤖</span>
+        <strong style="font-size:0.825rem; color:#0f172a;">Time Agent (InfraNexus AI)</strong>
+        <span style="font-size:0.7rem; color:#94a3b8;">System Ready</span>
+      </div>
+      <p style="font-size:0.85rem; color:#334155; margin:0; line-height:1.45;">
+        Chat cleared. Log today's field progress directly in natural text. I will extract structured engineering attributes, match against the baseline schedule, and route to the Planner Review Queue.
+      </p>
+    </div>
+  `;
+}
+
+function sendQuickReply(text) {
+  const input = document.getElementById('time-agent-input');
+  if (input) {
+    input.value = text;
+    sendTimeAgentMessage();
+  }
+}
+
+async function sendTimeAgentMessage() {
+  const input = document.getElementById('time-agent-input');
+  const sendBtn = document.getElementById('time-agent-send-btn');
+  const container = document.getElementById('chat-messages-container');
+  if (!input || !container) return;
+  const text = input.value.trim();
+  if (!text) return;
+
+  // Render Supervisor user message bubble (right-aligned)
+  const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const userMsgEl = document.createElement('div');
+  userMsgEl.className = 'chat-msg chat-user';
+  userMsgEl.style.cssText = 'align-self: flex-end; max-width: 80%; background: #0284c7; color: #ffffff; border-radius: 12px 12px 2px 12px; padding: 0.85rem 1rem; box-shadow: 0 1px 3px rgba(2, 132, 199, 0.2);';
+  userMsgEl.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem; gap:1rem;">
+      <strong style="font-size:0.75rem; color:#e0f2fe;">👷 Site Supervisor</strong>
+      <span style="font-size:0.65rem; color:#bae6fd;">${timeStr}</span>
+    </div>
+    <div style="font-size:0.875rem; line-height:1.4;">${escapeHtml(text)}</div>
+  `;
+  container.appendChild(userMsgEl);
+  input.value = '';
+  container.scrollTop = container.scrollHeight;
+
+  // Show temporary "Thinking..." bubble
+  const typingEl = document.createElement('div');
+  typingEl.className = 'chat-msg chat-typing';
+  typingEl.style.cssText = 'align-self: flex-start; max-width: 75%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px 12px 12px 2px; padding: 0.75rem 1rem; color: #64748b; font-size: 0.8rem;';
+  typingEl.innerHTML = `<span>⚙️ Analyzing text & matching against Primavera P6 baseline...</span>`;
+  container.appendChild(typingEl);
+  container.scrollTop = container.scrollHeight;
+
+  if (sendBtn) sendBtn.disabled = true;
+
+  try {
+    const res = await fetch('/api/v1/events/quick-log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: text,
+        project_id: 'OIL-DNPE-2026',
+        submitted_by: 'Site Supervisor (Field)'
+      })
+    });
+
+    typingEl.remove();
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || 'Failed to process quick log');
+    }
+
+    const data = await res.json();
+    const botMsgEl = document.createElement('div');
+    botMsgEl.className = 'chat-msg chat-system';
+    botMsgEl.style.cssText = 'align-self: flex-start; max-width: 85%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px 12px 12px 2px; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+
+    let badgeClass = 'badge-low';
+    if (data.confidence_tier === 'HIGH') badgeClass = 'badge-high';
+    else if (data.confidence_tier === 'MEDIUM') badgeClass = 'badge-medium';
+    else if (data.confidence_tier === 'UNMATCHED') badgeClass = 'badge-unmatched';
+
+    const fields = data.extracted_fields || {};
+    const hasMatch = data.matched_activity_id && data.confidence_tier !== 'UNMATCHED';
+    const confMsg = data.message || data.confirmation_message || 'Event processed.';
+    const scoreVal = data.top_score !== undefined ? data.top_score : (data.score !== undefined ? data.score : 0);
+    const scorePct = (scoreVal * 100).toFixed(1);
+
+    botMsgEl.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+        <div style="display:flex; align-items:center; gap:0.4rem;">
+          <span style="font-size:1.1rem;">🤖</span>
+          <strong style="font-size:0.825rem; color:#0f172a;">Time Agent</strong>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.4rem;">
+          <span class="badge ${badgeClass}">${data.confidence_tier} (${scorePct}%)</span>
+        </div>
+      </div>
+      <div style="font-size:0.875rem; color:#1e293b; margin-bottom:0.75rem; line-height:1.45; background:#f8fafc; padding:0.6rem 0.75rem; border-radius:6px; border-left:3px solid ${data.confidence_tier === 'HIGH' ? 'var(--success)' : (data.confidence_tier === 'MEDIUM' ? 'var(--warning)' : 'var(--danger)')};">
+        ${escapeHtml(confMsg)}
+      </div>
+
+      <!-- Extracted Fields Table/Grid -->
+      <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:0.6rem 0.75rem; margin-bottom:0.75rem; font-size:0.775rem;">
+        <div style="font-weight:700; color:#475569; margin-bottom:0.35rem; text-transform:uppercase; letter-spacing:0.03em;">Extracted Field Event</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:0.35rem; color:#334155;">
+          <div><span style="color:#64748b;">Discipline:</span> <strong>${escapeHtml(fields.discipline || 'Unknown')}</strong></div>
+          <div><span style="color:#64748b;">Location:</span> <strong>${escapeHtml(fields.location || 'General Site')}</strong></div>
+          <div><span style="color:#64748b;">Status:</span> <strong>${escapeHtml(fields.status || 'In Progress')}</strong></div>
+          <div><span style="color:#64748b;">Activity:</span> <strong>${escapeHtml(fields.activity_description || text)}</strong></div>
+        </div>
+      </div>
+
+      ${hasMatch ? `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:0.6rem 0.75rem;">
+          <div>
+            <div style="font-size:0.7rem; color:#166534; font-weight:700; text-transform:uppercase;">Matched P6 Activity</div>
+            <div style="font-size:0.825rem; font-weight:700; color:#14532d;">${escapeHtml(data.matched_activity_id)}: ${escapeHtml(data.matched_activity_description || '')}</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="switchTab('review'); openReviewModal('${data.event_id}')" style="background:#ffffff; border-color:#86efac; color:#166534; white-space:nowrap; margin-left:0.75rem;">
+            Inspect in Queue &rarr;
+          </button>
+        </div>
+      ` : `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#fef2f2; border:1px solid #fecaca; border-radius:6px; padding:0.6rem 0.75rem;">
+          <div>
+            <div style="font-size:0.7rem; color:#991b1b; font-weight:700; text-transform:uppercase;">Clarification Prompt</div>
+            <div style="font-size:0.8rem; color:#7f1d1d;">No confident activity match. Please provide line number, equipment ID, or area.</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="switchTab('review')" style="background:#ffffff; border-color:#fca5a5; color:#991b1b; white-space:nowrap; margin-left:0.75rem;">
+            View Review Queue &rarr;
+          </button>
+        </div>
+      `}
+    `;
+
+    container.appendChild(botMsgEl);
+    container.scrollTop = container.scrollHeight;
+
+    // Refresh review queue badge and queue data
+    loadReviewQueue();
+    loadDashboardSummary();
+    showToast('Event logged & routed to Planner Review Queue!', 'success');
+  } catch (err) {
+    if (typingEl.parentNode) typingEl.remove();
+    const errEl = document.createElement('div');
+    errEl.className = 'chat-msg chat-system';
+    errEl.style.cssText = 'align-self: flex-start; max-width: 80%; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 12px 12px 12px 2px; padding: 0.85rem 1rem; color: #991b1b; font-size: 0.825rem;';
+    errEl.innerHTML = `<strong>Error logging event:</strong> ${escapeHtml(err.message)}`;
+    container.appendChild(errEl);
+    container.scrollTop = container.scrollHeight;
+    showToast('Quick log failed: ' + err.message, 'error');
+  } finally {
+    if (sendBtn) sendBtn.disabled = false;
+  }
+}
+
+// 7.5. Institutional Memory Analytics
+async function loadHistoricalInsights(discipline) {
+  if (discipline === undefined) {
+    const filterEl = document.getElementById('history-discipline-filter');
+    discipline = filterEl ? filterEl.value : '';
+  }
+  
+  try {
+    let url = '/api/v1/insights/history';
+    if (discipline) {
+      url += `?discipline=${encodeURIComponent(discipline)}`;
+    }
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Failed to load historical insights');
+    const data = await res.json();
+    state.historicalInsights = data;
+    renderHistoricalInsights(data);
+  } catch (err) {
+    showToast('Error loading institutional memory: ' + err.message, 'error');
+  }
+}
+
+function filterHistoryByDiscipline(discipline) {
+  loadHistoricalInsights(discipline);
+}
+
+function renderHistoricalInsights(data) {
+  if (!data) return;
+  
+  // Summary Metrics
+  const compEl = document.getElementById('hist-metric-completed');
+  const overEl = document.getElementById('hist-metric-overruns');
+  const ontimeEl = document.getElementById('hist-metric-ontime');
+  const avgVarEl = document.getElementById('hist-metric-avg-var');
+  const countEl = document.getElementById('history-record-count');
+
+  if (compEl) compEl.innerText = data.total_completed_activities;
+  if (overEl) overEl.innerText = data.total_overrun_count;
+  if (ontimeEl) ontimeEl.innerText = data.total_ontime_or_early_count;
+  
+  if (avgVarEl) {
+    const avg = data.project_avg_variance_days;
+    avgVarEl.innerText = `${avg > 0 ? '+' : ''}${avg} d`;
+    avgVarEl.style.color = avg > 0 ? 'var(--danger)' : 'var(--success)';
+  }
+
+  if (countEl) {
+    countEl.innerText = `Showing ${data.activities.length} completed activities${data.discipline_filter ? ` for ${data.discipline_filter}` : ''}`;
+  }
+
+  // Discipline Overrun Breakdown Cards
+  const breakdownContainer = document.getElementById('history-discipline-breakdown');
+  if (breakdownContainer && data.discipline_summary) {
+    if (!data.discipline_summary.length) {
+      breakdownContainer.innerHTML = `<div style="grid-column:1/-1; color:#64748b; font-size:0.85rem; padding:1rem; text-align:center;">No discipline summaries available for current selection.</div>`;
+    } else {
+      breakdownContainer.innerHTML = data.discipline_summary.map(ds => {
+        const hasOverruns = ds.total_overrun_days > 0;
+        return `
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:1rem; display:flex; flex-direction:column; justify-content:space-between;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.5rem;">
+              <strong style="font-size:0.9rem; color:#0f172a;">${escapeHtml(ds.discipline)}</strong>
+              <span class="badge ${hasOverruns ? 'badge-low' : 'badge-high'}">
+                ${ds.avg_variance_days > 0 ? '+' : ''}${ds.avg_variance_days} d avg
+              </span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; font-size:0.775rem; margin-top:0.5rem; color:#475569;">
+              <div>Total Overrun: <strong style="color:${hasOverruns ? 'var(--danger)' : 'var(--success)'};">${ds.total_overrun_days} d</strong></div>
+              <div>Overrun Items: <strong style="color:var(--danger);">${ds.overrun_count}</strong></div>
+              <div>On-Time / Early: <strong style="color:var(--success);">${ds.ontime_count}</strong></div>
+              <div>Total Completed: <strong>${ds.activity_count}</strong></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // Render Table
+  renderHistoryTable(data.activities);
+}
+
+function renderHistoryTable(activities) {
+  const tbody = document.getElementById('history-table-body');
+  if (!tbody) return;
+
+  if (!activities || !activities.length) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:2rem; color:#64748b;">No completed historical activities found.</td></tr>`;
+    return;
+  }
+
+  // Sort activities based on state.historySortCol & state.historySortAsc
+  const sorted = [...activities].sort((a, b) => {
+    let valA = a[state.historySortCol];
+    let valB = b[state.historySortCol];
+    if (typeof valA === 'string') {
+      valA = valA.toLowerCase();
+      valB = (valB || '').toLowerCase();
+      return state.historySortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+    }
+    return state.historySortAsc ? (valA - valB) : (valB - valA);
+  });
+
+  tbody.innerHTML = sorted.map(act => {
+    const isOverrun = act.variance_days > 0;
+    const isAhead = act.variance_days < 0;
+    const varColor = isOverrun ? 'var(--danger)' : 'var(--success)';
+    const varSign = act.variance_days > 0 ? '+' : '';
+    
+    let statusBadge = '<span class="badge badge-high">ON TIME</span>';
+    if (isOverrun) {
+      statusBadge = '<span class="badge badge-low">OVERRUN</span>';
+    } else if (isAhead) {
+      statusBadge = '<span class="badge badge-high">AHEAD</span>';
+    }
+
+    return `
+      <tr>
+        <td style="font-weight:700; color:#0284c7; white-space:nowrap;">${escapeHtml(act.activity_id)}</td>
+        <td style="font-weight:500; max-width:320px;">${escapeHtml(act.description)}</td>
+        <td><span class="badge-tag">${escapeHtml(act.discipline)}</span></td>
+        <td style="font-size:0.775rem; color:#64748b; white-space:nowrap;">${act.planned_start} &rarr; ${act.planned_finish}</td>
+        <td style="font-size:0.775rem; color:#475569; white-space:nowrap;">${act.actual_start} &rarr; ${act.actual_finish}</td>
+        <td style="text-align:center; font-weight:600;">${act.planned_duration_days} d</td>
+        <td style="text-align:center; font-weight:600;">${act.actual_duration_days} d</td>
+        <td style="text-align:center; font-weight:700; color:${varColor};">
+          ${varSign}${act.variance_days} d
+        </td>
+        <td style="text-align:center;">${statusBadge}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function sortHistoryTable(col) {
+  if (state.historySortCol === col) {
+    state.historySortAsc = !state.historySortAsc;
+  } else {
+    state.historySortCol = col;
+    state.historySortAsc = false; // Default desc for numbers/dates
+  }
+  if (state.historicalInsights && state.historicalInsights.activities) {
+    renderHistoryTable(state.historicalInsights.activities);
   }
 }
 

@@ -1,9 +1,12 @@
 import os
 import shutil
+from datetime import datetime
 from typing import List, Optional, Dict, Any
+from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from sqlalchemy import text
+
 
 from backend.app.db.session import get_db
 from backend.app.models.entities import Project, Activity, Document, FieldEvent, Match, AuditLog
@@ -279,3 +282,138 @@ def get_system_health(db: Session = Depends(get_db)):
         "demo_mode": True,
         "offline_ready": True
     }
+
+# 16. Time Agent: Quick Log Conversational Logging Endpoint
+class QuickLogRequest(BaseModel):
+    text: str
+    project_id: str = "OIL-DNPE-2026"
+    submitted_by: str = "Site Supervisor"
+
+@router.post("/events/quick-log")
+def quick_log_event(req: QuickLogRequest, db: Session = Depends(get_db)):
+    """
+    Conversational text-based logging for site supervisors as an alternative to document upload.
+    Creates a Document record with file_type='quick_log', extracts structured facts,
+    runs matching engine, and returns confirmation & candidate matches.
+    """
+    if not req.text or not req.text.strip():
+        raise HTTPException(status_code=400, detail="Log text cannot be empty")
+
+    project_id = req.project_id or "OIL-DNPE-2026"
+    submitted_by = req.submitted_by or "Site Supervisor"
+
+    # 1. Create Document record
+    doc = Document(
+        project_id=project_id,
+        filename=f"QuickLog_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.txt",
+        file_type="quick_log",
+        file_size=len(req.text.strip().encode("utf-8")),
+        raw_text=req.text.strip(),
+        uploaded_by=submitted_by
+    )
+    db.add(doc)
+    db.commit()
+    db.refresh(doc)
+
+    # 2. Run through existing extractor
+    extractor = get_extractor()
+    provider_name = "live_gemini" if settings.AI_PROVIDER == "gemini" and settings.GEMINI_API_KEY else "deterministic_fallback"
+    extracted_items = extractor.extract_events(doc.raw_text or "", metadata={"filename": doc.filename, "source": "quick_log"})
+
+    if not extracted_items:
+        from backend.app.schemas.schemas import FieldEventExtract
+        extracted_items = [FieldEventExtract(
+            activity_description=req.text.strip()[:200],
+            source_reference=doc.filename,
+            evidence_text=req.text.strip()
+        )]
+
+    engine = MatchingEngine(db, project_id=project_id)
+    last_match_resp = None
+    saved_event = None
+
+    for item in extracted_items:
+        evt = FieldEvent(
+            document_id=doc.id,
+            raw_text=item.evidence_text or item.activity_description or req.text.strip(),
+            event_date=item.event_date or datetime.utcnow().strftime("%Y-%m-%d"),
+            discipline=item.discipline,
+            activity_description=item.activity_description or req.text.strip()[:200],
+            location=item.location,
+            equipment_id=item.equipment_id,
+            status=item.status or "IN_PROGRESS",
+            progress_percent=item.progress_percent if item.progress_percent is not None else (100.0 if item.status == "COMPLETED" else 0.0),
+            quantity=item.quantity,
+            unit=item.unit,
+            evidence_text=item.evidence_text or req.text.strip(),
+            extraction_provider=provider_name
+        )
+        db.add(evt)
+        db.flush()
+
+        last_match_resp = engine.process_and_persist_matches(evt)
+        saved_event = evt
+
+    db.commit()
+
+    # 3. Analyze match & build confirmation message
+    top_cand = last_match_resp.top_candidates[0] if (last_match_resp and last_match_resp.top_candidates) else None
+    conf_tier = last_match_resp.confidence_tier if last_match_resp else "UNMATCHED"
+    score = top_cand.scores.final_score if top_cand else 0.0
+
+    is_valid_match = (conf_tier in ["HIGH", "MEDIUM"] and score >= settings.THRESHOLD_UNMATCHED)
+
+    if is_valid_match and top_cand:
+        matched_id = top_cand.activity_id
+        matched_desc = top_cand.description
+        confirmation = f"Logged: {saved_event.activity_description} - matched to {matched_id} ({conf_tier} confidence)."
+    else:
+        matched_id = None
+        matched_desc = None
+        if not saved_event.location and not saved_event.equipment_id:
+            confirmation = "Logged into review queue, but needs clarification. Which line or equipment ID is this near? (e.g. near V-105 or Pump House PH-1)"
+        else:
+            confirmation = f"Logged into review queue, but no direct schedule activity matched with high confidence ({conf_tier}). Please provide more detail on the specific line number or work package."
+
+    return {
+        "status": "success",
+        "document_id": doc.id,
+        "event_id": saved_event.id if saved_event else None,
+        "extracted_fields": {
+            "discipline": saved_event.discipline if saved_event else None,
+            "location": saved_event.location if saved_event else None,
+            "equipment_id": saved_event.equipment_id if saved_event else None,
+            "status": saved_event.status if saved_event else "IN_PROGRESS",
+            "progress_percent": saved_event.progress_percent if saved_event else 0.0,
+            "quantity": saved_event.quantity if saved_event else None,
+            "unit": saved_event.unit if saved_event else None,
+            "activity_description": saved_event.activity_description if saved_event else req.text.strip()
+        },
+        "matched_activity_id": matched_id,
+        "matched_activity_description": matched_desc,
+        "confidence_tier": conf_tier,
+        "score": round(score, 3),
+        "top_score": round(score, 3),
+        "confirmation_message": confirmation,
+        "message": confirmation,
+        "needs_detail": not is_valid_match
+    }
+
+# 17. Institutional Memory: Historical Execution Patterns & Variance
+@router.get("/insights/history")
+def get_historical_insights(
+    discipline: Optional[str] = None,
+    project_id: str = "OIL-DNPE-2026",
+    db: Session = Depends(get_db)
+):
+    """
+    Surfaces historical execution patterns from already-approved data:
+    1. Planned vs actual duration in days
+    2. Variance in days
+    3. Group and aggregate by discipline (overruns vs on-time/early)
+    4. Project-level summary sorted by discipline with most overrun days first
+    """
+    from backend.app.services.analytics.history_service import HistoryService
+    service = HistoryService(db, project_id=project_id)
+    return service.get_historical_insights(discipline=discipline)
+
